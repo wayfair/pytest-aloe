@@ -3,7 +3,9 @@ __pycache__
 tmp_file_*
 /.eggs
 /aloe.egg-info
+/pytest_aloe.egg-info
 /build/
 /dist/
 /docs/_build/
 /tests/integration/calculator-actual.txt
+.tox

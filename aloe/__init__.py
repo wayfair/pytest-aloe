@@ -12,7 +12,7 @@ from __future__ import absolute_import
 import sys
 import threading
 
-from aloe.registry import (
+from .registry import (
     after,
     around,
     before,
@@ -30,7 +30,7 @@ def main(argv=None):  # pragma: no cover
     if argv is None:
         argv = sys.argv
 
-    from aloe.runner import Runner
+    from .runner import Runner
     Runner(argv)
 
 

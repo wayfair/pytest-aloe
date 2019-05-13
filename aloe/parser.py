@@ -21,8 +21,8 @@ from gherkin.parser import Parser
 from gherkin.token_matcher import TokenMatcher
 
 from aloe import strings
-from aloe.exceptions import AloeSyntaxError
-from aloe.utils import memoizedproperty
+from .exceptions import AloeSyntaxError
+from .utils import memoizedproperty
 
 # Pylint can't figure out methods vs. properties and which classes are
 # abstract

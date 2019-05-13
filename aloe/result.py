@@ -15,19 +15,19 @@ import sys
 from contextlib import contextmanager
 from functools import wraps
 
-import colorama
-from colorama import Cursor
-import colors
+# import colorama
+# from colorama import Cursor
+# import colors
 
-from aloe.registry import (
+from .registry import (
     CallbackDecorator,
     CALLBACK_REGISTRY,
     PriorityClass,
 )
-from aloe.strings import ljust, represent_table
-from aloe.tools import hook_not_reentrant
-from aloe.utils import memoizedproperty, PY3
-from nose.result import TextTestResult
+from .strings import ljust, represent_table
+from .tools import hook_not_reentrant
+from .utils import memoizedproperty, PY3
+# from nose.result import TextTestResult
 
 # A decorator to add callbacks which wrap the steps looser than all the other
 # callbacks.
@@ -38,7 +38,7 @@ outer_around = CallbackDecorator(CALLBACK_REGISTRY, 'around',
 
 
 # Initialize Colorama to support colored output on Windows.
-colorama.init()
+# colorama.init()
 
 # Global reference to the Terminal:
 # This exists because the hooks have to be registered before the test is
@@ -80,7 +80,7 @@ class Terminal(object):
 
     is_a_tty = sys.stdout.isatty()
 
-    move_up = Cursor.UP()
+    # move_up = Cursor.UP()
 
     def __init__(self, kind=None, stream=None, force_styling=False):
         if stream is None:

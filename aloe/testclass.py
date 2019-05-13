@@ -17,23 +17,23 @@ import ast
 import unittest
 from contextlib import contextmanager
 
-from nose.plugins.attrib import attr
+# from nose.plugins.attrib import attr
 
-from aloe.codegen import make_function
-from aloe.fs import path_to_module_name
-from aloe.parser import (
+from .codegen import make_function
+from .fs import path_to_module_name
+from .parser import (
     Background,
     Feature,
     Scenario,
     Step,
 )
-from aloe.registry import (
+from .registry import (
     CallbackDecorator,
     CALLBACK_REGISTRY,
     PriorityClass,
     STEP_REGISTRY,
 )
-from aloe.utils import identifier
+from .utils import identifier
 
 
 class TestStep(Step):
@@ -271,8 +271,8 @@ def run_example(self):
         method.scenario = scenario
         method.scenario_index = index
 
-        for tag in scenario.tags:
-            method = attr(tag)(method)
+        # for tag in scenario.tags:
+        #     method = attr(tag)(method)
 
         return method
 

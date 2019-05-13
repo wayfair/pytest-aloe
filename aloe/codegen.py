@@ -11,7 +11,7 @@ import ast
 from contextlib import contextmanager
 from textwrap import dedent
 
-from aloe.utils import identifier
+from .utils import identifier
 
 
 FUNCTION_DEF_SAMPLE = ast.parse('def func(): pass')

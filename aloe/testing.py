@@ -18,16 +18,16 @@ import unittest
 from contextlib import contextmanager
 from functools import wraps
 
-from aloe import world
-from aloe.fs import path_to_module_name
-from aloe.plugin import GherkinPlugin
-from aloe.registry import (
+from . import world
+from .fs import path_to_module_name
+from .plugin import GherkinPlugin
+from .registry import (
     CALLBACK_REGISTRY,
     PriorityClass,
     STEP_REGISTRY,
 )
-from aloe.runner import Runner
-from aloe.utils import PY3, TestWrapperIO
+from .runner import Runner
+from .utils import PY3, TestWrapperIO
 
 # When the outer Nose captures output, it's a different type between Python 2
 # and 3.

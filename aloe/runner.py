@@ -14,7 +14,7 @@ import os
 
 import nose.core
 
-from aloe.plugin import GherkinPlugin
+from .plugin import GherkinPlugin
 
 
 class Runner(nose.core.TestProgram):

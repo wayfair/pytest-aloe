@@ -10,7 +10,7 @@ from __future__ import absolute_import
 from builtins import super
 # pylint:enable=redefined-builtin
 
-from aloe.utils import PY3
+from .utils import PY3
 
 
 class AloeSyntaxError(SyntaxError):

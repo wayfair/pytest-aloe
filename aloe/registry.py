@@ -17,12 +17,12 @@ import re
 from collections import OrderedDict
 from functools import wraps, partial
 
-from aloe.codegen import multi_manager
-from aloe.exceptions import (
+from .codegen import multi_manager
+from .exceptions import (
     undefined_step,
     StepLoadingError,
 )
-from aloe.utils import unwrap_function
+from .utils import unwrap_function
 
 
 # What part of the test to hook

@@ -13,9 +13,9 @@ import fnmatch
 
 from future.utils import raise_from
 
-from nose.importer import Importer
+# # from nose.importer import Importer
 
-from aloe.exceptions import StepDiscoveryError
+from .exceptions import StepDiscoveryError
 
 
 def path_to_module_name(filename):
@@ -41,29 +41,29 @@ class FeatureLoader(object):
     """Loader class responsible for findind features and step
     definitions along a given path on filesystem"""
 
-    importer = Importer()
+    # importer = Importer()
 
     @classmethod
     def find_and_load_step_definitions(cls, dir_):
         """
         Load the steps from the specified directory.
         """
+        pass
+        # for path, _, files in os.walk(dir_):
+        #     for filename in fnmatch.filter(files, '*.py'):
+        #         # Import the module using its fully qualified name
+        #         filename = os.path.relpath(os.path.join(path, filename))
+        #         module_name = path_to_module_name(filename)
 
-        for path, _, files in os.walk(dir_):
-            for filename in fnmatch.filter(files, '*.py'):
-                # Import the module using its fully qualified name
-                filename = os.path.relpath(os.path.join(path, filename))
-                module_name = path_to_module_name(filename)
-
-                try:
-                    cls.importer.importFromPath(filename, module_name)
-                except ImportError as exc:
-                    raise_from(
-                        StepDiscoveryError(
-                            "Cannot load step definition file: '%s'" % filename
-                        ),
-                        exc
-                    )
+        #         try:
+        #             cls.importer.importFromPath(filename, module_name)
+        #         except ImportError as exc:
+        #             raise_from(
+        #                 StepDiscoveryError(
+        #                     "Cannot load step definition file: '%s'" % filename
+        #                 ),
+        #                 exc
+        #             )
 
     @classmethod
     def find_feature_directories(cls, dir_):

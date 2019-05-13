@@ -1,0 +1,10 @@
+site_name: pytest-aloe
+site_description: Pytest plugin to support BDD using ghirkin files
+site_author: Dennis Miasoutov
+
+theme: readthedocs
+
+repo_url: https://github.com/offbeatful/pytest-aloe
+
+pages:
+- Home: index.md
