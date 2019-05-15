@@ -8,12 +8,13 @@
             "name": "Debug Tests",
             "type": "python",
             "request": "launch",
-            "pythonPath": "${config:python.pythonPath}",            
+            "pythonPath": "${config:python.pythonPath}",
             "cwd": "${workspaceFolder}",
             "args": [
                 "-m",
                 "pytest",
-                "-vvv"
+                "-vvv",
+                "-s"
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

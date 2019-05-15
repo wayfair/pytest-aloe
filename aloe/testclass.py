@@ -322,11 +322,7 @@ def run_example(self):
             # This has to be a single statement, in order to set its source
             # location as a whole below
             """
-    try:
-        step{i}.test = self
-        func{i}(step{i}, *args{i}, **kwargs{i})
-    finally:
-        step{i}.test = None
+    func{i}(*args{i}, **kwargs{i})
             """.format(i=i)
             for i in range(len(step_definitions))
         )
