@@ -8,9 +8,9 @@ def test_get_request(request):
     return request
 
 @step(r'I have a foo fixture with value "([^"]*)"')
-def foo(arg):
+def foo(self, arg, bar):    
     print("\nfoo executed");
 
 @step(r'there is a list')
-def foo2():
+def foo2(self):
     print("foo2 executed");
