@@ -97,6 +97,7 @@ class TestCase(unittest.TestCase):
     """
 
     feature = None  # Will be supplied when constructing derived classes
+    functions = []
 
     @classmethod
     def before_feature(cls, feature):
@@ -322,7 +323,7 @@ def run_example(self):
             """
     try:
         step{i}.test = self
-        args, kwargs = self._composekwargs(self.request, func{i}, args{i}, kwargs{i})
+        args, kwargs = self._composekwargs(self.getFunctionRequest(self._testMethodName), func{i}, args{i}, kwargs{i})
         func{i}(step{i}, *args, **kwargs)
     finally:
         step{i}.test = None
@@ -389,7 +390,7 @@ def run_example(self):
     def _composekwargs(request, step_func, step_args, step_kwargs):
         kwargs = {}
         all_args = [arg for arg in get_args(step_func) if arg != "self"]
-        all_fixture_args = list(request._fixturemanager._arg2fixturedefs.keys())
+        all_fixture_args = list(request._fixturemanager._arg2fixturedefs.keys()) if request else []
         # fill all fixture arguments and add it to existing step_kwargs
         step_fixture_args = [arg for arg in all_args if arg in all_fixture_args]
         kwargs = { **step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args) }
@@ -401,6 +402,13 @@ def run_example(self):
         kwargs = { **kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args)) }       
 
         return (), kwargs
+
+    @classmethod
+    def getFunctionRequest(cls, function_name):
+        for function in cls.functions:
+            if function._request:
+                if function_name == function._request.node.name:
+                    return function._request
 
 # A decorator to add callbacks which wrap the steps tighter than all the user
 # callbacks.
