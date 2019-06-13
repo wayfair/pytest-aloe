@@ -17,23 +17,21 @@ import ast
 import unittest
 from contextlib import contextmanager
 
-from nose.plugins.attrib import attr
-
-from aloe.codegen import make_function
-from aloe.fs import path_to_module_name
-from aloe.parser import (
+from .codegen import make_function
+from .fs import path_to_module_name
+from .parser import (
     Background,
     Feature,
     Scenario,
     Step,
 )
-from aloe.registry import (
+from .registry import (
     CallbackDecorator,
     CALLBACK_REGISTRY,
     PriorityClass,
     STEP_REGISTRY,
 )
-from aloe.utils import identifier
+from .utils import identifier, get_args
 
 
 class TestStep(Step):
@@ -99,6 +97,7 @@ class TestCase(unittest.TestCase):
     """
 
     feature = None  # Will be supplied when constructing derived classes
+    functions = []
 
     @classmethod
     def before_feature(cls, feature):
@@ -271,8 +270,8 @@ def run_example(self):
         method.scenario = scenario
         method.scenario_index = index
 
-        for tag in scenario.tags:
-            method = attr(tag)(method)
+        # for tag in scenario.tags:
+        #     method = attr(tag)(method)
 
         return method
 
@@ -324,7 +323,8 @@ def run_example(self):
             """
     try:
         step{i}.test = self
-        func{i}(step{i}, *args{i}, **kwargs{i})
+        args, kwargs = self._composekwargs(self.getFunctionRequest(self._testMethodName), func{i}, args{i}, kwargs{i})
+        func{i}(step{i}, *args, **kwargs)
     finally:
         step{i}.test = None
             """.format(i=i)
@@ -386,6 +386,29 @@ def run_example(self):
 
         return sorted(with_indices)
 
+    @staticmethod
+    def _composekwargs(request, step_func, step_args, step_kwargs):
+        kwargs = {}
+        all_args = [arg for arg in get_args(step_func) if arg != "self"]
+        all_fixture_args = list(request._fixturemanager._arg2fixturedefs.keys()) if request else []
+        # fill all fixture arguments and add it to existing step_kwargs
+        step_fixture_args = [arg for arg in all_args if arg in all_fixture_args]
+        kwargs = { **step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args) }
+
+        # identity what arguments left and fill them from step arguments
+        filled_args = kwargs.keys();        
+        left_over_args = [arg for arg in all_args if arg not in filled_args]
+
+        kwargs = { **kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args)) }       
+
+        return (), kwargs
+
+    @classmethod
+    def getFunctionRequest(cls, function_name):
+        for function in cls.functions:
+            if function._request:
+                if function_name == function._request.node.name:
+                    return function._request
 
 # A decorator to add callbacks which wrap the steps tighter than all the user
 # callbacks.

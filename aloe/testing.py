@@ -20,13 +20,11 @@ from functools import wraps
 
 from aloe import world
 from aloe.fs import path_to_module_name
-from aloe.plugin import GherkinPlugin
 from aloe.registry import (
     CALLBACK_REGISTRY,
     PriorityClass,
     STEP_REGISTRY,
 )
-from aloe.runner import Runner
 from aloe.utils import PY3, TestWrapperIO
 
 # When the outer Nose captures output, it's a different type between Python 2
@@ -182,54 +180,6 @@ def named_temporary_file(*args, **kwargs):
                 os.unlink(file_.name)
             except OSError:
                 pass
-
-
-class TestGherkinPlugin(GherkinPlugin):
-    """
-    Test Gherkin plugin.
-    """
-
-    def loadTestsFromFile(self, file_):
-        """
-        Record which tests were run.
-        """
-
-        for scenario in super().loadTestsFromFile(file_):
-            yield scenario
-
-        self.runner.tests_run.append(file_)
-
-
-class TestRunner(Runner):
-    """
-    A test test runner to store information about the tests run.
-
-    :param stream: a stream to write the output into (optional)
-    """
-
-    def gherkin_plugin(self):
-        """
-        Override the plugin class.
-        """
-
-        plugin = TestGherkinPlugin()
-        plugin.runner = self
-        return plugin
-
-    def __init__(self, *args, **kwargs):
-        self.tests_run = []
-        self.stream = kwargs.pop('stream')
-
-        super().__init__(*args, **kwargs)
-
-    def makeConfig(self, env, plugins=None):
-        config = super().makeConfig(env, plugins=plugins)
-
-        if self.stream:
-            config.stream = self.stream
-
-        return config
-
 
 class FeatureTest(unittest.TestCase):
     """

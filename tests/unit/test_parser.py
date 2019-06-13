@@ -11,8 +11,6 @@ from __future__ import absolute_import
 from builtins import zip
 # pylint:enable=redefined-builtin
 
-from nose.tools import assert_equal, assert_raises
-
 from aloe.parser import Feature, Scenario, Background
 from aloe.exceptions import AloeSyntaxError
 from aloe.testing import named_temporary_file

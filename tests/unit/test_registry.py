@@ -9,22 +9,10 @@ from __future__ import division
 from __future__ import absolute_import
 
 import unittest
+import pytest
 
-from nose.tools import (
-    assert_equal,
-    assert_raises,
-)
-
-from aloe.registry import (
-    CallbackDecorator,
-    CallbackDict,
-    PriorityClass,
-    StepDict,
-)
-from aloe.exceptions import (
-    StepLoadingError,
-    undefined_step,
-)
+from aloe.registry import CallbackDecorator, CallbackDict, PriorityClass, StepDict
+from aloe.exceptions import StepLoadingError, undefined_step
 
 from tests.utils import appender, before_after
 
@@ -45,7 +33,7 @@ def assert_matches(step_dict, sentence, func_args):
     :param func_args (callable, tuple, dict): Expected function and arguments
     """
 
-    assert_equal(step_dict.match_step(FakeStep(sentence)), func_args)
+    assert step_dict.match_step(FakeStep(sentence)) == func_args
 
 
 def assert_no_match(step_dict, sentence):
@@ -60,7 +48,7 @@ def test_StepDict_raise_StepLoadingError_if_first_argument_is_not_a_regex():
     not a regex
     """
     steps = StepDict()
-    with assert_raises(StepLoadingError):
+    with pytest.raises(StepLoadingError):
         steps.load("an invalid regex;)", lambda: "")
 
 
@@ -123,7 +111,7 @@ def test_StepDict_load_a_step_return_the_given_function():
     def func():  # pylint:disable=missing-docstring
         return ""
 
-    assert_equal(steps.load("another step", func), func)
+    assert steps.load("another step", func) == func
 
 
 def test_StepDict_can_extract_a_step_sentence_from_function_name():
@@ -135,7 +123,8 @@ def test_StepDict_can_extract_a_step_sentence_from_function_name():
 
     def a_step_sentence():  # pylint:disable=missing-docstring
         pass
-    assert_equal("A step sentence", steps.extract_sentence(a_step_sentence))
+
+    assert "A step sentence" == steps.extract_sentence(a_step_sentence)
 
 
 def test_StepDict_can_extract_a_step_sentence_from_function_doc():
@@ -148,7 +137,8 @@ def test_StepDict_can_extract_a_step_sentence_from_function_doc():
     def a_step_func():
         """A step sentence"""
         pass
-    assert_equal("A step sentence", steps.extract_sentence(a_step_func))
+
+    assert "A step sentence" == steps.extract_sentence(a_step_func)
 
 
 def test_StepDict_can_load_a_step_from_a_function():
@@ -199,6 +189,7 @@ def test_StepDict_can_exclude_methods_when_load_steps():
 
     class LotsOfSteps(object):
         """A class defining some steps."""
+
         exclude = ["step_1"]
 
         def step_1(self):  # pylint:disable=missing-docstring
@@ -224,8 +215,10 @@ def test_StepDict_can_exclude_callable_object_when_load_steps():
 
     class NoStep(object):
         """A class defining something that's not a step."""
+
         class NotAStep(object):
             """A callable which isn't a step."""
+
             def __call__(self):
                 pass
 
@@ -246,11 +239,11 @@ def test_unload_reload():
     steps = StepDict()
 
     # Load
-    steps.step(r'My step (\d)')(step)
-    steps.step(r'Another step (\d)')(step)
+    steps.step(r"My step (\d)")(step)
+    steps.step(r"Another step (\d)")(step)
 
-    assert_matches(steps, "My step 1", (step, ('1',), {}))
-    assert_matches(steps, "Another step 1", (step, ('1',), {}))
+    assert_matches(steps, "My step 1", (step, ("1",), {}))
+    assert_matches(steps, "Another step 1", (step, ("1",), {}))
 
     # Members added to step by registering it
     # pylint:disable=no-member
@@ -268,9 +261,9 @@ def test_unload_reload():
     assert_no_match(steps, "Another step 1")
 
     # Reload
-    steps.step(r'My step (\d)')(step)
+    steps.step(r"My step (\d)")(step)
 
-    assert_matches(steps, "My step 1", (step, ('1',), {}))
+    assert_matches(steps, "My step 1", (step, ("1",), {}))
 
 
 class CallbackDictTest(unittest.TestCase):
@@ -281,9 +274,9 @@ class CallbackDictTest(unittest.TestCase):
     def setUp(self):
         self.callbacks = CallbackDict()
 
-        self.before = CallbackDecorator(self.callbacks, 'before')
-        self.around = CallbackDecorator(self.callbacks, 'around')
-        self.after = CallbackDecorator(self.callbacks, 'after')
+        self.before = CallbackDecorator(self.callbacks, "before")
+        self.around = CallbackDecorator(self.callbacks, "around")
+        self.after = CallbackDecorator(self.callbacks, "after")
 
     def test_wrap(self):
         """
@@ -292,28 +285,32 @@ class CallbackDictTest(unittest.TestCase):
 
         sequence = []
 
-        self.before.all(appender(sequence, 'before'))
+        self.before.all(appender(sequence, "before"))
 
-        self.around.all(before_after(
-            appender(sequence, 'around_before'),
-            appender(sequence, 'around_after')
-        ))
+        self.around.all(
+            before_after(
+                appender(sequence, "around_before"), appender(sequence, "around_after")
+            )
+        )
 
-        self.after.all(appender(sequence, 'after'))
+        self.after.all(appender(sequence, "after"))
 
-        wrapped = appender(sequence, 'wrapped')
+        wrapped = appender(sequence, "wrapped")
 
-        wrap = self.callbacks.wrap('all', wrapped, 'hook_arg1', 'hook_arg2')
+        wrap = self.callbacks.wrap("all", wrapped, "hook_arg1", "hook_arg2")
 
-        wrap('wrap_arg1', 'wrap_arg2')
+        wrap("wrap_arg1", "wrap_arg2")
 
-        self.assertEqual(sequence, [
-            ('before', 'hook_arg1', 'hook_arg2'),
-            ('around_before', 'hook_arg1', 'hook_arg2'),
-            ('wrapped', 'wrap_arg1', 'wrap_arg2'),
-            ('around_after', 'hook_arg1', 'hook_arg2'),
-            ('after', 'hook_arg1', 'hook_arg2'),
-        ])
+        self.assertEqual(
+            sequence,
+            [
+                ("before", "hook_arg1", "hook_arg2"),
+                ("around_before", "hook_arg1", "hook_arg2"),
+                ("wrapped", "wrap_arg1", "wrap_arg2"),
+                ("around_after", "hook_arg1", "hook_arg2"),
+                ("after", "hook_arg1", "hook_arg2"),
+            ],
+        )
 
     def test_before_after(self):
         """
@@ -322,26 +319,30 @@ class CallbackDictTest(unittest.TestCase):
 
         sequence = []
 
-        self.before.all(appender(sequence, 'before'))
+        self.before.all(appender(sequence, "before"))
 
-        self.around.all(before_after(
-            appender(sequence, 'around_before'),
-            appender(sequence, 'around_after')
-        ))
+        self.around.all(
+            before_after(
+                appender(sequence, "around_before"), appender(sequence, "around_after")
+            )
+        )
 
-        self.after.all(appender(sequence, 'after'))
+        self.after.all(appender(sequence, "after"))
 
-        before, after = self.callbacks.before_after('all')
+        before, after = self.callbacks.before_after("all")
 
-        before('before_arg1', 'before_arg2')
-        after('after_arg1', 'after_arg2')
+        before("before_arg1", "before_arg2")
+        after("after_arg1", "after_arg2")
 
-        self.assertEqual(sequence, [
-            ('before', 'before_arg1', 'before_arg2'),
-            ('around_before', 'before_arg1', 'before_arg2'),
-            ('around_after', 'before_arg1', 'before_arg2'),
-            ('after', 'after_arg1', 'after_arg2'),
-        ])
+        self.assertEqual(
+            sequence,
+            [
+                ("before", "before_arg1", "before_arg2"),
+                ("around_before", "before_arg1", "before_arg2"),
+                ("around_after", "before_arg1", "before_arg2"),
+                ("after", "after_arg1", "after_arg2"),
+            ],
+        )
 
     @staticmethod
     def before_after_hook(sequence, when):
@@ -352,8 +353,8 @@ class CallbackDictTest(unittest.TestCase):
     def around_hook(cls, sequence):
         """An around hook appending to a sequence."""
         return lambda name: before_after(
-            cls.before_after_hook(sequence, 'around_before')(name),
-            cls.before_after_hook(sequence, 'around_after')(name)
+            cls.before_after_hook(sequence, "around_before")(name),
+            cls.before_after_hook(sequence, "around_after")(name),
         )
 
     def test_priority(self):
@@ -365,74 +366,71 @@ class CallbackDictTest(unittest.TestCase):
 
         sequence = []
 
-        for when in ('before', 'after', 'around'):
+        for when in ("before", "after", "around"):
             add_callback = getattr(self, when).all
-            if when == 'around':
+            if when == "around":
                 hook = self.around_hook(sequence)
             else:
                 hook = self.before_after_hook(sequence, when)
 
             # Default priority is 0
-            add_callback(hook('B1'))
-            add_callback(hook('B2'))
+            add_callback(hook("B1"))
+            add_callback(hook("B2"))
 
             # Explicit lower (=earlier) priority
-            add_callback(hook('A1'), priority=-10)
-            add_callback(hook('A2'), priority=-10)
+            add_callback(hook("A1"), priority=-10)
+            add_callback(hook("A2"), priority=-10)
 
             # Explicit higher (=later) priority
-            add_callback(hook('C1'), priority=10)
-            add_callback(hook('C2'), priority=10)
+            add_callback(hook("C1"), priority=10)
+            add_callback(hook("C2"), priority=10)
 
             # Add a callback with a different priority class
-            CallbackDecorator(self.callbacks, when,
-                              priority_class=-1).all(hook('Z1'))
-            CallbackDecorator(self.callbacks, when,
-                              priority_class=1).all(hook('D1'))
+            CallbackDecorator(self.callbacks, when, priority_class=-1).all(hook("Z1"))
+            CallbackDecorator(self.callbacks, when, priority_class=1).all(hook("D1"))
 
-        wrap = self.callbacks.wrap('all', appender(sequence, 'wrapped'))
+        wrap = self.callbacks.wrap("all", appender(sequence, "wrapped"))
 
         wrap()
 
-        self.assertEqual([item for (item,) in sequence], [
-            'beforeZ1',
-            'beforeA1',
-            'beforeA2',
-            'beforeB1',
-            'beforeB2',
-            'beforeC1',
-            'beforeC2',
-            'beforeD1',
-
-            'around_beforeZ1',
-            'around_beforeA1',
-            'around_beforeA2',
-            'around_beforeB1',
-            'around_beforeB2',
-            'around_beforeC1',
-            'around_beforeC2',
-            'around_beforeD1',
-
-            'wrapped',
-
-            'around_afterD1',
-            'around_afterC2',
-            'around_afterC1',
-            'around_afterB2',
-            'around_afterB1',
-            'around_afterA2',
-            'around_afterA1',
-            'around_afterZ1',
-
-            'afterD1',
-            'afterC2',
-            'afterC1',
-            'afterB2',
-            'afterB1',
-            'afterA2',
-            'afterA1',
-            'afterZ1',
-        ])
+        self.assertEqual(
+            [item for (item,) in sequence],
+            [
+                "beforeZ1",
+                "beforeA1",
+                "beforeA2",
+                "beforeB1",
+                "beforeB2",
+                "beforeC1",
+                "beforeC2",
+                "beforeD1",
+                "around_beforeZ1",
+                "around_beforeA1",
+                "around_beforeA2",
+                "around_beforeB1",
+                "around_beforeB2",
+                "around_beforeC1",
+                "around_beforeC2",
+                "around_beforeD1",
+                "wrapped",
+                "around_afterD1",
+                "around_afterC2",
+                "around_afterC1",
+                "around_afterB2",
+                "around_afterB1",
+                "around_afterA2",
+                "around_afterA1",
+                "around_afterZ1",
+                "afterD1",
+                "afterC2",
+                "afterC1",
+                "afterB2",
+                "afterB1",
+                "afterA2",
+                "afterA1",
+                "afterZ1",
+            ],
+        )
 
     def test_clear(self):
         """
@@ -444,124 +442,117 @@ class CallbackDictTest(unittest.TestCase):
             callbacks = CallbackDict()
             sequence = []
 
-            for when in ('before', 'after', 'around'):
+            for when in ("before", "after", "around"):
                 add_callback = CallbackDecorator(callbacks, when).all
-                if when == 'around':
+                if when == "around":
                     hook = self.around_hook(sequence)
                 else:
                     hook = self.before_after_hook(sequence, when)
 
                 # Default priority class
-                add_callback(hook('Default'))
+                add_callback(hook("Default"))
 
                 # Default priority class, specifying a name
-                add_callback(hook('Named'), name='named')
+                add_callback(hook("Named"), name="named")
 
                 # Different priority classes
-                CallbackDecorator(callbacks, when,
-                                  priority_class=-1).all(hook('Minus'))
-                CallbackDecorator(callbacks, when,
-                                  priority_class=1).all(hook('Plus'))
+                CallbackDecorator(callbacks, when, priority_class=-1).all(hook("Minus"))
+                CallbackDecorator(callbacks, when, priority_class=1).all(hook("Plus"))
 
                 # Different priority class, specifying a name
-                CallbackDecorator(callbacks, when,
-                                  priority_class=1).all(hook('PlusNamed'),
-                                                        name='named')
+                CallbackDecorator(callbacks, when, priority_class=1).all(
+                    hook("PlusNamed"), name="named"
+                )
 
             return callbacks, sequence
 
         # Verify ordering without clearing anything
         callbacks, sequence = prepare_hooks()
-        callbacks.wrap('all', appender(sequence, 'wrapped'))()
+        callbacks.wrap("all", appender(sequence, "wrapped"))()
 
-        self.assertEqual([item for (item,) in sequence], [
-            'beforeMinus',
-            'beforeDefault',
-            'beforeNamed',
-            'beforePlus',
-            'beforePlusNamed',
-
-            'around_beforeMinus',
-            'around_beforeDefault',
-            'around_beforeNamed',
-            'around_beforePlus',
-            'around_beforePlusNamed',
-
-            'wrapped',
-
-            'around_afterPlusNamed',
-            'around_afterPlus',
-            'around_afterNamed',
-            'around_afterDefault',
-            'around_afterMinus',
-
-            'afterPlusNamed',
-            'afterPlus',
-            'afterNamed',
-            'afterDefault',
-            'afterMinus',
-        ])
+        self.assertEqual(
+            [item for (item,) in sequence],
+            [
+                "beforeMinus",
+                "beforeDefault",
+                "beforeNamed",
+                "beforePlus",
+                "beforePlusNamed",
+                "around_beforeMinus",
+                "around_beforeDefault",
+                "around_beforeNamed",
+                "around_beforePlus",
+                "around_beforePlusNamed",
+                "wrapped",
+                "around_afterPlusNamed",
+                "around_afterPlus",
+                "around_afterNamed",
+                "around_afterDefault",
+                "around_afterMinus",
+                "afterPlusNamed",
+                "afterPlus",
+                "afterNamed",
+                "afterDefault",
+                "afterMinus",
+            ],
+        )
 
         # Only clear a particular name from the default priority class
         callbacks, sequence = prepare_hooks()
-        callbacks.clear(priority_class=PriorityClass.USER,
-                        name='named')
-        callbacks.wrap('all', appender(sequence, 'wrapped'))()
+        callbacks.clear(priority_class=PriorityClass.USER, name="named")
+        callbacks.wrap("all", appender(sequence, "wrapped"))()
 
-        self.assertEqual([item for (item,) in sequence], [
-            'beforeMinus',
-            'beforeDefault',
-            'beforePlus',
-            'beforePlusNamed',
-
-            'around_beforeMinus',
-            'around_beforeDefault',
-            'around_beforePlus',
-            'around_beforePlusNamed',
-
-            'wrapped',
-
-            'around_afterPlusNamed',
-            'around_afterPlus',
-            'around_afterDefault',
-            'around_afterMinus',
-
-            'afterPlusNamed',
-            'afterPlus',
-            'afterDefault',
-            'afterMinus',
-        ])
+        self.assertEqual(
+            [item for (item,) in sequence],
+            [
+                "beforeMinus",
+                "beforeDefault",
+                "beforePlus",
+                "beforePlusNamed",
+                "around_beforeMinus",
+                "around_beforeDefault",
+                "around_beforePlus",
+                "around_beforePlusNamed",
+                "wrapped",
+                "around_afterPlusNamed",
+                "around_afterPlus",
+                "around_afterDefault",
+                "around_afterMinus",
+                "afterPlusNamed",
+                "afterPlus",
+                "afterDefault",
+                "afterMinus",
+            ],
+        )
 
         # Only clear the default priority class
         callbacks, sequence = prepare_hooks()
         callbacks.clear(priority_class=PriorityClass.USER)
-        callbacks.wrap('all', appender(sequence, 'wrapped'))()
+        callbacks.wrap("all", appender(sequence, "wrapped"))()
 
-        self.assertEqual([item for (item,) in sequence], [
-            'beforeMinus',
-            'beforePlus',
-            'beforePlusNamed',
-
-            'around_beforeMinus',
-            'around_beforePlus',
-            'around_beforePlusNamed',
-
-            'wrapped',
-
-            'around_afterPlusNamed',
-            'around_afterPlus',
-            'around_afterMinus',
-
-            'afterPlusNamed',
-            'afterPlus',
-            'afterMinus',
-        ])
+        self.assertEqual(
+            [item for (item,) in sequence],
+            [
+                "beforeMinus",
+                "beforePlus",
+                "beforePlusNamed",
+                "around_beforeMinus",
+                "around_beforePlus",
+                "around_beforePlusNamed",
+                "wrapped",
+                "around_afterPlusNamed",
+                "around_afterPlus",
+                "around_afterMinus",
+                "afterPlusNamed",
+                "afterPlus",
+                "afterMinus",
+            ],
+        )
 
         # Clear all callbacks
         callbacks, sequence = prepare_hooks()
         callbacks.clear()
-        callbacks.wrap('all', appender(sequence, 'wrapped'))()
+        callbacks.wrap("all", appender(sequence, "wrapped"))()
 
-        self.assertEqual([item for (item,) in sequence], [
-            'wrapped',
-        ])
+        self.assertEqual([item for (item,) in sequence], ["wrapped"])
+
