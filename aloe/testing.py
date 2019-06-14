@@ -17,6 +17,7 @@ import tempfile
 import unittest
 from contextlib import contextmanager
 from functools import wraps
+import pytest
 
 from aloe import world
 from aloe.fs import path_to_module_name
@@ -40,64 +41,6 @@ else:
         StringIO.StringIO,
     )
 
-
-@contextmanager
-def _in_directory(directory):
-    """
-    A context manager to run the payload in a specified directory.
-
-    On exit, all modules that were imported from this directory are removed
-    from sys.modules.
-    """
-
-    directory = os.path.abspath(directory)
-    last_wd = os.getcwd()
-
-    os.chdir(directory)
-
-    try:
-        yield
-    finally:
-        os.chdir(last_wd)
-
-        # Unload modules which are loaded from the directory
-        unload_modules = []
-        unload_path_prefix = os.path.join(directory, '')
-        for module_name, module in sys.modules.items():
-            # Find out where is the module loaded from
-            try:
-                path = module.__file__
-            except AttributeError:
-                # Maybe a namespace package module?
-                try:
-                    if module.__spec__.origin == 'namespace':
-                        # pylint:disable=protected-access
-                        path = module.__path__._path[0]
-                        # pylint:enable=protected-access
-                    else:
-                        continue
-                except AttributeError:
-                    continue
-
-            # Is it loaded from a file in the directory?
-            if not path:
-                continue
-
-            path = os.path.abspath(path)
-            if not path.startswith(unload_path_prefix):
-                continue
-
-            # Does its name match what would it be if the module was really
-            # imported from here? Consider two directories, 'foo' and 'foo/bar'
-            # on sys.path, foo/bar/baz.py might have been loaded from either.
-            path = path[len(unload_path_prefix):]
-            if module_name == path_to_module_name(path):
-                unload_modules.append(module_name)
-
-        for module in unload_modules:
-            del sys.modules[module]
-
-
 def in_directory(directory):
     """
     A decorator to change the current directory and add the new one to the
@@ -110,7 +53,7 @@ def in_directory(directory):
     Applies to either a function or an instance of
     TestCase, in which case setUp/tearDown are used.
     """
-
+    
     def wrapper(func_or_class):
         """
         Wrap a function or a test case class to execute in a different
@@ -123,28 +66,8 @@ def in_directory(directory):
             is_test_case = False
 
         if is_test_case:
-            # Wrap setUp/tearDown
-            old_setup = func_or_class.setUp
-            old_teardown = func_or_class.tearDown
-
-            in_directory_cm = [None]
-
-            @wraps(old_setup)
-            def setUp(self):
-                """Wrap setUp to change to given directory first."""
-                in_directory_cm[0] = _in_directory(directory)
-                in_directory_cm[0].__enter__()
-                old_setup(self)
-
-            @wraps(old_teardown)
-            def tearDown(self):
-                """Wrap tearDown to restore the original directory."""
-                old_teardown(self)
-                in_directory_cm[0].__exit__(None, None, None)
-                in_directory_cm[0] = None
-
-            func_or_class.setUp = setUp
-            func_or_class.tearDown = tearDown
+            
+            func_or_class.test_dir = os.path.abspath(directory)
 
             return func_or_class
 
@@ -155,9 +78,8 @@ def in_directory(directory):
                 """
                 Execute the function in a different directory.
                 """
-
-                with _in_directory(directory):
-                    return func_or_class(*args, **kwargs)
+                
+                return func_or_class(*args, **kwargs)
 
             return wrapped
 
@@ -193,6 +115,17 @@ class FeatureTest(unittest.TestCase):
 
         os.environ['NOSE_NOCAPTURE'] = '1'
 
+    @pytest.fixture(autouse=True)
+    def inittestdir(self, testdir):
+        self.testdir = testdir        
+        
+        # copy 
+        steps_file = os.path.join(self.test_dir, "features/steps.py") 
+        if (os.path.isfile(steps_file)):
+            with open(steps_file, 'r') as file:
+                testdir.makeconftest(file.read())
+        
+
     def run_feature_string(self, feature_string):
         """
         Run the specified string as a feature.
@@ -202,15 +135,10 @@ class FeatureTest(unittest.TestCase):
         contained within would be found by the loader.
         """
 
-        if not os.path.isdir('features'):
-            raise ValueError(
-                "Features directory not found in {0}".format(os.getcwd()))
+        self.testdir.makefile(self._testMethodName + ".feature", feature_string)        
+        result = self.testdir.inline_run("--capture=sys", plugins=["pytest_aloe"])
+        return TestResult(result)
 
-        with named_temporary_file(suffix='.feature', dir='features') \
-                as feature_file:
-            feature_file.write(feature_string.encode('utf-8'))
-            feature_file.close()
-            return self.run_features(os.path.relpath(feature_file.name))
 
     def run_features(self, *features, **kwargs):
         """
@@ -291,3 +219,9 @@ class FeatureTest(unittest.TestCase):
                 print(result.captured_stream.getvalue())
                 print("--END--")
             raise
+
+
+class TestResult(object):
+    def __init__(self, result):
+        self.success = result.ret == 0
+        # self.captured_stream = self.stdout

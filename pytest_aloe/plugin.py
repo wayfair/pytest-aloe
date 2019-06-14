@@ -10,16 +10,16 @@ from _pytest.unittest import TestCaseFunction
 
 
 def pytest_addoption(parser):
-    group = parser.getgroup('aloe')
-    group.addoption(
-        '--foo',
-        action='store',
-        dest='dest_foo',
-        default='2019',
-        help='Set the value for the fixture "bar".'
-    )
+    group = parser.getgroup('pytest-aloe')
+    # group.addoption(
+    #     '--foo',
+    #     action='store',
+    #     dest='dest_foo',
+    #     default='2019',
+    #     help='Set the value for the fixture "bar".'
+    # )
 
-    parser.addini('HELLO', 'Dummy pytest.ini setting')
+    # parser.addini('HELLO', 'Dummy pytest.ini setting')
 
 
 def pytest_collect_file(path, parent):

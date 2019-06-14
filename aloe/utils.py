@@ -13,6 +13,7 @@ from builtins import *
 import io
 import re
 import sys
+import inspect
 
 try:
     from functools import lru_cache

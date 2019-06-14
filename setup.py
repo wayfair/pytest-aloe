@@ -24,6 +24,7 @@ if __name__ == '__main__':
                 'Programming Language :: Python',
                 'Programming Language :: Python :: 2',
                 'Programming Language :: Python :: 3',
+                'Framework :: Pytest',
             ],
 
             packages=find_packages(exclude=['tests']),
