@@ -10,7 +10,6 @@ from __future__ import absolute_import
 import operator
 from functools import reduce  # pylint:disable=redefined-builtin
 
-from nose.tools import assert_equal
 
 from aloe import world
 from aloe.testclass import TestCase

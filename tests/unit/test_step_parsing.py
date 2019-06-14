@@ -8,34 +8,32 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 
-from nose.tools import assert_equal
-
 from aloe.parser import Feature, Step
 
 
-I_LIKE_VEGETABLES = '''
+I_LIKE_VEGETABLES = """
 Given I hold a special love for green vegetables
-'''
+"""
 
-I_HAVE_TASTY_BEVERAGES = '''
+I_HAVE_TASTY_BEVERAGES = """
 Given I have the following tasty beverages in my freezer:
    | Name   | Type     | Price |
    | Skol   | Beer     |  3.80 |
    | Nestea | Ice-tea  |  2.10 |
-'''
+"""
 
-I_DIE_HAPPY = '''
+I_DIE_HAPPY = """
 Given I shall die with love in my heart
-'''
+"""
 
-BACKGROUND_WITH_TAGGED_SCENARIO = '''
+BACKGROUND_WITH_TAGGED_SCENARIO = """
     Background:
         background line 1
 
     @wip
     Scenario:
         Scenario line 1
-'''
+"""
 
 MULTI_LINE = '''
 Given I have a string like so:
@@ -74,10 +72,7 @@ def test_step_has_repr():
     Step implements __repr__ nicely
     """
     step, = parse_steps(I_HAVE_TASTY_BEVERAGES)
-    assert_equal(
-        repr(step),
-        '<Step: "' + first_line_of(I_HAVE_TASTY_BEVERAGES) + '">'
-    )
+    assert repr(step) == '<Step: "' + first_line_of(I_HAVE_TASTY_BEVERAGES) + '">'
 
 
 def test_can_get_sentence_from_string():
@@ -89,10 +84,7 @@ def test_can_get_sentence_from_string():
 
     assert isinstance(step, Step)
 
-    assert_equal(
-        step.sentence,
-        first_line_of(I_HAVE_TASTY_BEVERAGES)
-    )
+    assert step.sentence == first_line_of(I_HAVE_TASTY_BEVERAGES)
 
 
 def test_can_parse_keys_from_table():
@@ -101,7 +93,7 @@ def test_can_parse_keys_from_table():
     """
 
     step, = parse_steps(I_HAVE_TASTY_BEVERAGES)
-    assert_equal(step.keys, ('Name', 'Type', 'Price'))
+    assert step.keys, ("Name", "Type" == "Price")
 
 
 def test_can_parse_tables():
@@ -111,18 +103,10 @@ def test_can_parse_tables():
 
     step, = parse_steps(I_HAVE_TASTY_BEVERAGES)
 
-    assert_equal(step.hashes, (
-        {
-            'Name': 'Skol',
-            'Type': 'Beer',
-            'Price': '3.80'
-        },
-        {
-            'Name': 'Nestea',
-            'Type': 'Ice-tea',
-            'Price': '2.10'
-        },
-    ))
+    assert step.hashes == (
+        {"Name": "Skol", "Type": "Beer", "Price": "3.80"},
+        {"Name": "Nestea", "Type": "Ice-tea", "Price": "2.10"},
+    )
 
 
 def test_can_parse_a_unary_array_from_single_step():
@@ -131,10 +115,9 @@ def test_can_parse_a_unary_array_from_single_step():
     """
 
     steps = parse_steps(I_HAVE_TASTY_BEVERAGES)
-    assert_equal(len(steps), 1)
+    assert len(steps) == 1
     assert isinstance(steps[0], Step)
-    assert_equal(steps[0].sentence,
-                 first_line_of(I_HAVE_TASTY_BEVERAGES))
+    assert steps[0].sentence == first_line_of(I_HAVE_TASTY_BEVERAGES)
 
 
 def test_can_parse_a_unary_array_from_complicated_step():
@@ -143,9 +126,9 @@ def test_can_parse_a_unary_array_from_complicated_step():
     """
 
     steps = parse_steps(I_LIKE_VEGETABLES)
-    assert_equal(len(steps), 1)
+    assert len(steps) == 1
     assert isinstance(steps[0], Step)
-    assert_equal(steps[0].sentence, first_line_of(I_LIKE_VEGETABLES))
+    assert steps[0].sentence == first_line_of(I_LIKE_VEGETABLES)
 
 
 def test_can_parse_regular_step_followed_by_tabular_step():
@@ -154,11 +137,11 @@ def test_can_parse_regular_step_followed_by_tabular_step():
     array.
     """
     steps = parse_steps(I_LIKE_VEGETABLES + I_HAVE_TASTY_BEVERAGES)
-    assert_equal(len(steps), 2)
+    assert len(steps) == 2
     assert isinstance(steps[0], Step)
     assert isinstance(steps[1], Step)
-    assert_equal(steps[0].sentence, first_line_of(I_LIKE_VEGETABLES))
-    assert_equal(steps[1].sentence, first_line_of(I_HAVE_TASTY_BEVERAGES))
+    assert steps[0].sentence == first_line_of(I_LIKE_VEGETABLES)
+    assert steps[1].sentence == first_line_of(I_HAVE_TASTY_BEVERAGES)
 
 
 def test_can_parse_tabular_step_followed_by_regular_step():
@@ -168,11 +151,11 @@ def test_can_parse_tabular_step_followed_by_regular_step():
     """
 
     steps = parse_steps(I_HAVE_TASTY_BEVERAGES + I_LIKE_VEGETABLES)
-    assert_equal(len(steps), 2)
+    assert len(steps) == 2
     assert isinstance(steps[0], Step)
     assert isinstance(steps[1], Step)
-    assert_equal(steps[0].sentence, first_line_of(I_HAVE_TASTY_BEVERAGES))
-    assert_equal(steps[1].sentence, first_line_of(I_LIKE_VEGETABLES))
+    assert steps[0].sentence == first_line_of(I_HAVE_TASTY_BEVERAGES)
+    assert steps[1].sentence == first_line_of(I_LIKE_VEGETABLES)
 
 
 def test_can_parse_two_ordinary_steps():
@@ -181,11 +164,11 @@ def test_can_parse_two_ordinary_steps():
     """
 
     steps = parse_steps(I_DIE_HAPPY + I_LIKE_VEGETABLES)
-    assert_equal(len(steps), 2)
+    assert len(steps) == 2
     assert isinstance(steps[0], Step)
     assert isinstance(steps[1], Step)
-    assert_equal(steps[0].sentence, first_line_of(I_DIE_HAPPY))
-    assert_equal(steps[1].sentence, first_line_of(I_LIKE_VEGETABLES))
+    assert steps[0].sentence == first_line_of(I_DIE_HAPPY)
+    assert steps[1].sentence == first_line_of(I_LIKE_VEGETABLES)
 
 
 def test_multiline_is_part_of_previous_step():
@@ -194,9 +177,9 @@ def test_multiline_is_part_of_previous_step():
     """
 
     steps = parse_steps(MULTI_LINE)
-    assert_equal(len(steps), 1)
+    assert len(steps) == 1
     assert isinstance(steps[0], Step)
-    assert_equal(steps[0].sentence, 'Given I have a string like so:')
+    assert steps[0].sentence == "Given I have a string like so:"
 
 
 def test_table_escaping():
@@ -204,73 +187,82 @@ def test_table_escaping():
     Table columns can be correctly escaped
     """
 
-    steps = parse_steps(r"""
+    steps = parse_steps(
+        r"""
     Given I have items in my table:
         | Column 1                 |
         | This is a column         |
         | This is \| also a column |
         | This is \\ a backslash   |
-    """)
+    """
+    )
 
-    assert_equal(len(steps), 1)
+    assert len(steps) == 1
 
     step, = steps
 
-    assert_equal(step.table, (
-        (r'Column 1',),
-        (r'This is a column',),
-        (r'This is | also a column',),
-        (r'This is \ a backslash',),
-    ))
+    assert step.table == (
+        (r"Column 1",),
+        (r"This is a column",),
+        (r"This is | also a column",),
+        (r"This is \ a backslash",),
+    )
 
 
 def test_multiline_is_parsed():
     """Test parsing a multiline string in a step."""
     step, = parse_steps(MULTI_LINE)
-    assert_equal(step.sentence, 'Given I have a string like so:')
-    assert_equal(step.multiline, u"""This is line one
+    assert step.sentence == "Given I have a string like so:"
+    assert (
+        step.multiline
+        == """This is line one
 and this is line two
 and this is line three
   and this is line four,
 
-  with spaces at the beginning""")
+  with spaces at the beginning"""
+    )
 
 
 def test_step_with_hash():
     """Test parsing a step with a hash"""
-    step, = parse_steps('''
+    step, = parse_steps(
+        """
     Given I have product #1234 in my cart
-    ''')
+    """
+    )
 
-    assert_equal(step.sentence, 'Given I have product #1234 in my cart')
+    assert step.sentence == "Given I have product #1234 in my cart"
 
 
 def test_comments():
     """Test parsing Gherkin comments."""
-    steps = parse_steps('''
+    steps = parse_steps(
+        """
     # A comment
     Given I have a comment
                         # Another comment
     And I have another comment
-    ''')
-
-    assert_equal(
-        [step.sentence for step in steps],
-        [
-            'Given I have a comment',
-            'And I have another comment',
-        ]
+    """
     )
+
+    assert [step.sentence for step in steps] == [
+        "Given I have a comment",
+        "And I have another comment",
+    ]
 
 
 def test_multiline_with_hash():
     """Test parsing a multiline with a hash"""
-    step, = parse_steps('''
+    step, = parse_steps(
+        '''
     Given I have the following products in my cart:
     """
     #1234
     #2345
     """
-    ''')
+    '''
+    )
 
-    assert_equal(step.multiline, u"#1234\n#2345")
+    assert step.multiline == "#1234\n#2345"
+
