@@ -13,7 +13,7 @@ import os
 from contextlib import contextmanager
 from inspect import getsourcefile
 
-from nose.importer import Importer
+# from nose.importer import Importer
 
 from aloe import world
 from aloe.exceptions import StepDiscoveryError
@@ -76,7 +76,7 @@ class SimpleScenarioTest(FeatureTest):
     def step_module_filename(self, module_name):
         """The file name corresponding to the steps module."""
 
-        Importer().importFromDir('.', module_name)
+        # Importer().importFromDir('.', module_name)
         module = getsourcefile(sys.modules[module_name])
         del sys.modules[module_name]
         return module
@@ -348,7 +348,7 @@ AssertionError
         feature_one = 'features/with_tags/one.feature'
 
         # Run scenarios by tag
-        self.assert_feature_success(feature_one, '-a', 'hana')
+        self.assert_feature_success(feature_one, '-m', 'hana')
         self.assertEqual(world.all_results, [1, 11, 22])
 
         # Run scenarios with a tag that's not there

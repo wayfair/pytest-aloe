@@ -15,6 +15,7 @@ from builtins import super
 
 import ast
 import unittest
+import pytest
 from contextlib import contextmanager
 
 from .codegen import make_function
@@ -193,6 +194,7 @@ class TestCase(unittest.TestCase):
 
         testclass = type(class_name, (cls,), members)
         testclass.feature.testclass = testclass
+        testclass.scenarios = [scenario.__name__ for scenario in scenarios]
         return testclass
 
     @classmethod
@@ -363,6 +365,12 @@ def run_example(self):
         if not is_background:
             run_steps = CALLBACK_REGISTRY.wrap('example', run_steps,
                                                step_container, outline, steps)
+            if (step_container.tags):
+                for tag in list(step_container.tags):
+                    if (tag not in pytest.mark._markers):
+                        pytest.mark._markers.add(tag)
+                    decorator = pytest.mark.__getattr__(tag)
+                    run_steps = decorator(run_steps)
 
         return run_steps
 

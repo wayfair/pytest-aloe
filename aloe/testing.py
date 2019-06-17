@@ -18,6 +18,9 @@ import unittest
 from contextlib import contextmanager
 from functools import wraps
 import pytest
+from pathlib import Path
+import glob
+from distutils.dir_util import copy_tree
 
 from aloe import world
 from aloe.fs import path_to_module_name
@@ -118,15 +121,41 @@ class FeatureTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def inittestdir(self, testdir):
         self.testdir = testdir        
-        
-        # copy 
+        # copy_tree(self.test_dir, self.testdir.tmpdir.strpath) 
+
+        # copy steps.py as conftest.py
+                # copy 
         steps_file = os.path.join(self.test_dir, "features/steps.py") 
         if (os.path.isfile(steps_file)):
             with open(steps_file, 'r') as file:
                 testdir.makeconftest(file.read())
+        # imports = []
+        # # if (filename.suffix == ".feature" or filename.name == "steps"):
+        # for filename in Path(self.testdir.tmpdir.strpath).glob('**/steps.py'):                    
+        #     # dir = os.path.dirname(filename)
+        #     relative_path = os.path.relpath(filename, self.testdir.tmpdir.strpath)            
+        #     # os.path.ensure(relative_dir)
+
+        # #     dir = os.path.dirname(filename)
+        # #     relative_dir = os.path.relpath(dir, self.testdir.tmpdir.strpath)
+        #     import_steps = relative_path[:-3].replace(os.sep, ".") # + ".steps" if relative_dir else "steps"
+        # #     # if (relative_dir.startswith(".")):
+        # #     #     relative_dir = relative_dir[1:]
+        #     imports.append(f"import {import_steps}")
+        # #     with open(filename, 'r') as ile
+        # # #         sub_dir = testdir.mkdir(relative_dir)
+        # #     sub_dir.makeconftest(file.read())
+        # testdir.makeconftest(imports)
+        # testdir.chdir()
+
+        # copy feature files
+        # files = glob.iglob(os.path.join(source_dir, "*.*"))
+        # for file in files:
+        #     if os.path.isfile(file):
+        #         shutil.copy2(file, dest_dir)
         
 
-    def run_feature_string(self, feature_string):
+    def run_feature_string(self, feature_string, pytest_args = None):
         """
         Run the specified string as a feature.
 
@@ -134,13 +163,16 @@ class FeatureTest(unittest.TestCase):
         directory relative to the current directory. This ensures the steps
         contained within would be found by the loader.
         """
+        
+        self.testdir.makefile(".feature", feature_string)  
 
-        self.testdir.makefile(self._testMethodName + ".feature", feature_string)        
-        result = self.testdir.inline_run("--capture=sys", plugins=["pytest_aloe"])
-        return TestResult(result)
+        filename = self._testMethodName + ".feature"
+        return self.run_features(filename);
+        # self.testdir.inline_run(filename, plugins=["pytest_aloe"])
+        # return TestResult(result)
 
 
-    def run_features(self, *features, **kwargs):
+    def run_features(self, *args, **kwargs):
         """
         Run the specified features.
         """
@@ -162,31 +194,45 @@ class FeatureTest(unittest.TestCase):
         STEP_REGISTRY.clear()
         world.__dict__.clear()
 
-        argv = ['aloe']
+        # argv = ['aloe']
 
-        if verbosity:
-            argv += ['--verbosity', str(verbosity)]
+        # if verbosity:
+        #     argv += ['--verbosity', str(verbosity)]
 
-        if force_color:
-            argv += ['--color']
+        # if force_color:
+        #     argv += ['--color']
 
-        argv += list(features)
+        # argv += list(features)
 
         # Save the loaded module list to restore later
-        old_modules = set(sys.modules.keys())
+        # old_modules = set(sys.modules.keys())
 
-        result = TestRunner(exit=False, argv=argv, stream=stream)
-        result.captured_stream = stream
+        # result = TestRunner(exit=False, argv=argv, stream=stream)
+        # result.captured_stream = stream
 
-        # To avoid affecting the (outer) testsuite and its subsequent tests,
-        # unload all modules that were newly loaded. This also ensures that they
-        # are loaded again for the next tests, registering relevant steps and
-        # hooks.
-        new_modules = set(sys.modules.keys())
-        for module_name in new_modules - old_modules:
-            del sys.modules[module_name]
+        # # To avoid affecting the (outer) testsuite and its subsequent tests,
+        # # unload all modules that were newly loaded. This also ensures that they
+        # # are loaded again for the next tests, registering relevant steps and
+        # # hooks.
+        # new_modules = set(sys.modules.keys())
+        # for module_name in new_modules - old_modules:
+        #     del sys.modules[module_name]
+        
+        # run empty
+        # if (not args):
+        result = self.testdir.inline_run(*args, plugins=["pytest_aloe"])
+        return TestResult(result);
 
-        return result
+        # # run specific test
+        # feature = list(args)[0]
+        # args = " ".join(list(args)[1:])
+        # feature_file = os.path.join(self.test_dir, feature)
+        # feature_string = ""
+        # with open(feature_file, 'r') as file:
+        #     feature_string = file.read()
+
+        # return self.run_feature_string(feature_string, args)        
+        
 
     def assert_feature_success(self, *features, **kwargs):
         """
@@ -198,11 +244,12 @@ class FeatureTest(unittest.TestCase):
             assert result.success
             return result
         except AssertionError:
-            if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
-                print("--Output--")
-                print(result.captured_stream.getvalue())
-                print("--END--")
-            raise
+            # if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
+            #     print("--Output--")
+            #     print(result.captured_stream.getvalue())
+            #     print("--END--")
+            # raise
+            pass
 
     def assert_feature_fail(self, *features, **kwargs):
         """
@@ -214,11 +261,12 @@ class FeatureTest(unittest.TestCase):
             assert not result.success
             return result
         except AssertionError:
-            if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
-                print("--Output--")
-                print(result.captured_stream.getvalue())
-                print("--END--")
-            raise
+            # if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
+            #     print("--Output--")
+            #     print(result.captured_stream.getvalue())
+            #     print("--END--")
+            # raise
+            pass
 
 
 class TestResult(object):

@@ -15,7 +15,7 @@
                 "pytest",
                 "tests/unit",
                 "-vvv",
-                "-s"
+                "-s"                
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
