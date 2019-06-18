@@ -103,25 +103,20 @@ class TestCase(unittest.TestCase):
     @classmethod
     def before_feature(cls, feature):
         """Call feature-level before callbacks."""
-        raise NotImplementedError(
-            "This should be supplied when constructing derived classes.")
+        pass        
 
     @classmethod
     def after_feature(cls, feature):
         """Call feature-level after callbacks."""
-        raise NotImplementedError(
-            "This should be supplied when constructing derived classes.")
+        pass        
 
     # Methods for the use of the tested code
-
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpClass(cls):        
         cls.before_feature(cls.feature)
 
     @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
+    def tearDownClass(cls):        
         cls.after_feature(cls.feature)
 
     def behave_as(self, context_step, string):

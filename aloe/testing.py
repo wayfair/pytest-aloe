@@ -20,7 +20,7 @@ from functools import wraps
 import pytest
 from pathlib import Path
 import glob
-from distutils.dir_util import copy_tree
+import shutil
 
 from aloe import world
 from aloe.fs import path_to_module_name
@@ -121,38 +121,19 @@ class FeatureTest(unittest.TestCase):
     @pytest.fixture(autouse=True)
     def inittestdir(self, testdir):
         self.testdir = testdir        
-        # copy_tree(self.test_dir, self.testdir.tmpdir.strpath) 
 
-        # copy steps.py as conftest.py
-                # copy 
-        steps_file = os.path.join(self.test_dir, "features/steps.py") 
+        features_dir = os.path.join(self.test_dir, "features") 
+        
+        steps_file = os.path.join(features_dir, "steps.py") 
         if (os.path.isfile(steps_file)):
             with open(steps_file, 'r') as file:
-                testdir.makeconftest(file.read())
-        # imports = []
-        # # if (filename.suffix == ".feature" or filename.name == "steps"):
-        # for filename in Path(self.testdir.tmpdir.strpath).glob('**/steps.py'):                    
-        #     # dir = os.path.dirname(filename)
-        #     relative_path = os.path.relpath(filename, self.testdir.tmpdir.strpath)            
-        #     # os.path.ensure(relative_dir)
+                testdir.makeconftest(file.read())  
 
-        # #     dir = os.path.dirname(filename)
-        # #     relative_dir = os.path.relpath(dir, self.testdir.tmpdir.strpath)
-        #     import_steps = relative_path[:-3].replace(os.sep, ".") # + ".steps" if relative_dir else "steps"
-        # #     # if (relative_dir.startswith(".")):
-        # #     #     relative_dir = relative_dir[1:]
-        #     imports.append(f"import {import_steps}")
-        # #     with open(filename, 'r') as ile
-        # # #         sub_dir = testdir.mkdir(relative_dir)
-        # #     sub_dir.makeconftest(file.read())
-        # testdir.makeconftest(imports)
-        # testdir.chdir()
-
-        # copy feature files
-        # files = glob.iglob(os.path.join(source_dir, "*.*"))
-        # for file in files:
-        #     if os.path.isfile(file):
-        #         shutil.copy2(file, dest_dir)
+        files = glob.iglob(os.path.join(features_dir, "*.feature"))
+        dest_dir = testdir.mkdir("features");
+        for file in files:
+            if os.path.isfile(file):
+                shutil.copy2(file, dest_dir)      
         
 
     def run_feature_string(self, feature_string, pytest_args = None):

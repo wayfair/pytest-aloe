@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 import operator
 from functools import reduce  # pylint:disable=redefined-builtin
+import pytest
 
 
 from aloe import world
@@ -121,7 +122,7 @@ class CallbackTest(FeatureTest):
     def test_testcase_methods(self):
         """Test setUp and tearDown on the test class."""
 
-        test_cls = 'tests.callbacks_app.features.conftest.CallbackTestCase'
+        test_cls = 'tests.callbacks_app.features.steps.CallbackTestCase'
         with set_environ(GHERKIN_CLASS=test_cls):
             self.assert_feature_success('features/testcase_methods.feature')
 
@@ -222,6 +223,7 @@ class CallbackTest(FeatureTest):
 
 
 @in_directory('tests/multiple_steps_app')
+@pytest.mark.skip(reason="multiple directories not supported")
 class MultipleDirectoriesCallbackTest(FeatureTest):
     """
     Test before.all callbacks when running features from multiple directories.
