@@ -38,7 +38,7 @@ class FeatureTestTest(FeatureTest):
             """
         )
 
-        self.assertTrue(result.success)
+        assert result.success, result.captured_stream.getvalue()
 
     def test_run_feature_string_fail(self):
         """
@@ -55,7 +55,7 @@ class FeatureTestTest(FeatureTest):
             """
         )
 
-        self.assertFalse(result.success)
+        assert not result.success, result.captured_stream.getvalue()
 
     def test_run_feature_string_parse_error(self):
         """
@@ -68,7 +68,7 @@ class FeatureTestTest(FeatureTest):
             """
         )
 
-        self.assertFalse(result.success)
+        assert not result.success, result.captured_stream.getvalue()
 
     def test_run_good_feature_string_non_ascii(self):
         """
@@ -86,7 +86,7 @@ class FeatureTestTest(FeatureTest):
             """
         )
 
-        self.assertTrue(result.success)
+        assert result.success, result.captured_stream.getvalue()
 
 
 def relative(directory):

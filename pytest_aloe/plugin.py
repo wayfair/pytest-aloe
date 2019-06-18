@@ -34,11 +34,16 @@ def pytest_addoption(parser):
         metavar='TEST_CLASS',
         help='Base class to use for the generated tests',
     )
+    group.addoption(         
+        '--scenario-indices', 
+        action='store',
+        dest='scenario_indices',
+        default='',
+        help='Only run scenarios with these indices (comma-separated)',        
+    )
 
     # parser.addini('HELLO', 'Dummy pytest.ini setting')
 
-def pytest_pycollect_makeitem(collector, name, obj):
-    pass
 
 def pytest_collect_file(path, parent):
     """
@@ -47,7 +52,6 @@ def pytest_collect_file(path, parent):
     """
     if path.ext == '.feature':
         return Feature(path, parent)
-
 
 class Feature(File):
     def collect(self):
@@ -87,15 +91,6 @@ class FeatureUnitTestCase(UnitTestCase):
             yield TestCaseFunction(name, parent=self, callobj=funcobj)
             foundsomething = True        
 
-# class FeatureTestCase(UnitTestCase):
-
-#      def __init__(self, name, parent, unit):
-#          super(UnitTestCase, self).__init__(name, parent=parent)
-#          self.obj = unit
-
-#      def collect(self):
-#          tests = super(FeatureTestCase, self).collet(self)
-#          pass
 
 @pytest.fixture(autouse=True, scope='session')
 def session_hooks():
@@ -106,14 +101,22 @@ def session_hooks():
     # teardown_stuff
     after_all()
 
+def pytest_collection_modifyitems(items, config):
+    scenario_indices = config.getoption("scenario_indices")
+    if not scenario_indices:
+        return
 
-# @pytest.fixture(autouse=True)
-# def class_hooks(request):
-#     before_feature, after_feature = CALLBACK_REGISTRY.before_after('feature')
-#     # setup_stuff
-#     before_feature(request.instance.feature)                
-#     yield
-#     # teardown_stuff
-#     after_feature(request.instance.feature)
+    remaining = []
+    deselected = []
+    indices = [int(str) for str in scenario_indices.split(',')]    
+    for colitem in items:
+        index = colitem.obj.scenario_index
+        if index not in indices:
+            deselected.append(colitem)
+        else:
+            remaining.append(colitem)
+        
 
-
+    if deselected:
+        config.hook.pytest_deselected(items=deselected)
+        items[:] = remaining

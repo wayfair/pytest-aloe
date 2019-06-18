@@ -13,9 +13,10 @@
             "args": [
                 "-m",
                 "pytest",
-                "tests/unit",
+                "tests/functional",
                 "-vvv",
-                "-s"                
+                "-k",
+                "test_scenario_indices"                
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

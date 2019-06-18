@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import absolute_import
 
 import os
+import unittest
 
 from aloe.testing import (
     FeatureTest,
@@ -16,6 +17,7 @@ from aloe.testing import (
 
 
 @in_directory('tests/step_definition_app')
+@unittest.skip("The test is no longer valid. All steps should be written/referenced in conftest.py")
 class StepLoadingTest(FeatureTest):
     """
     Test that calculator feature works as expected.

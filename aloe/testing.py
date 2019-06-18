@@ -164,8 +164,7 @@ class FeatureTest(unittest.TestCase):
         stream = kwargs.get('stream')
         force_color = kwargs.get('force_color', False)
 
-        if stream is None and isinstance(sys.stdout, CAPTURED_OUTPUTS):
-            # Don't show results of running the inner tests if the outer Nose
+        if stream is None:       
             # redirects output
             stream = TestWrapperIO()
 
@@ -174,45 +173,13 @@ class FeatureTest(unittest.TestCase):
         CALLBACK_REGISTRY.clear(priority_class=PriorityClass.USER)
         STEP_REGISTRY.clear()
         world.__dict__.clear()
-
-        # argv = ['aloe']
-
-        # if verbosity:
-        #     argv += ['--verbosity', str(verbosity)]
-
-        # if force_color:
-        #     argv += ['--color']
-
-        # argv += list(features)
-
-        # Save the loaded module list to restore later
-        # old_modules = set(sys.modules.keys())
-
-        # result = TestRunner(exit=False, argv=argv, stream=stream)
-        # result.captured_stream = stream
-
-        # # To avoid affecting the (outer) testsuite and its subsequent tests,
-        # # unload all modules that were newly loaded. This also ensures that they
-        # # are loaded again for the next tests, registering relevant steps and
-        # # hooks.
-        # new_modules = set(sys.modules.keys())
-        # for module_name in new_modules - old_modules:
-        #     del sys.modules[module_name]
         
-        # run empty
-        # if (not args):
+        old_stdout = sys.stdout        
+        sys.stdout = stream
+        
         result = self.testdir.inline_run(*args, plugins=["pytest_aloe"])
-        return TestResult(result);
-
-        # # run specific test
-        # feature = list(args)[0]
-        # args = " ".join(list(args)[1:])
-        # feature_file = os.path.join(self.test_dir, feature)
-        # feature_string = ""
-        # with open(feature_file, 'r') as file:
-        #     feature_string = file.read()
-
-        # return self.run_feature_string(feature_string, args)        
+        sys.stdout = old_stdout        
+        return TestResult(result, stream);
         
 
     def assert_feature_success(self, *features, **kwargs):
@@ -225,12 +192,12 @@ class FeatureTest(unittest.TestCase):
             assert result.success
             return result
         except AssertionError:
-            # if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
-            #     print("--Output--")
-            #     print(result.captured_stream.getvalue())
-            #     print("--END--")
-            # raise
-            pass
+            if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
+                print("--Output--")
+                print(result.captured_stream.getvalue())
+                print("--END--")
+            raise    
+            pass        
 
     def assert_feature_fail(self, *features, **kwargs):
         """
@@ -242,15 +209,16 @@ class FeatureTest(unittest.TestCase):
             assert not result.success
             return result
         except AssertionError:
-            # if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
-            #     print("--Output--")
-            #     print(result.captured_stream.getvalue())
-            #     print("--END--")
-            # raise
+            if isinstance(result.captured_stream, CAPTURED_OUTPUTS):
+                print("--Output--")
+                print(result.captured_stream.getvalue())
+                print("--END--")
+            raise
             pass
 
 
 class TestResult(object):
-    def __init__(self, result):
-        self.success = result.ret == 0
-        # self.captured_stream = self.stdout
+    def __init__(self, result, stream):
+        realpassed, realskipped, realfailed = result.listoutcomes();
+        self.success = len(realskipped) == 0 and len(realfailed) == 0 and len(realpassed) > 0
+        self.captured_stream = stream        
