@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pathlib import Path
 
 import pytest
 from aloe.testclass import TestCase, TestScenario

@@ -17,7 +17,7 @@ from tests.testing import (
     FeatureTest,
     in_directory,
 )
-from aloe.utils import TestWrapperIO
+from aloe.utils import StreamTestWrapperIO
 # from mock import patch
 import unittest
 
@@ -68,7 +68,7 @@ class OutputterTest(FeatureTest):
     def test_uncolored_output(self):
         """Test streamed output"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with patch('aloe.result.AloeTestResult.printSummary'):
             self.run_features(self.feature, verbosity=3, stream=stream)
@@ -124,7 +124,7 @@ Feature: Highlighting
     def test_color_output(self):
         """Test streamed output with color"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with \
                 patch('aloe.result.Terminal', new=MockTerminal), \
@@ -197,7 +197,7 @@ t.green(Given I have a table:)
     def test_customized_color_output(self):
         """Test streamed color output with overridden colors."""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with self.environment_override('CUCUMBER_COLORS',
                                        'failed=magenta:passed=blue'):
@@ -259,7 +259,7 @@ t.blue(Given I have a table:)
     def test_tty_output(self):
         """Test streamed output with tty control codes"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with \
                 patch('aloe.result.Terminal', new=MockTerminal) as mock_term, \

@@ -18,7 +18,6 @@ import unittest
 from contextlib import contextmanager
 from functools import wraps
 import pytest
-from pathlib import Path
 import glob
 import shutil
 
@@ -29,7 +28,7 @@ from aloe.registry import (
     PriorityClass,
     STEP_REGISTRY,
 )
-from aloe.utils import PY3, TestWrapperIO
+from aloe.utils import PY3, StreamTestWrapperIO
 
 # When the outer Nose captures output, it's a different type between Python 2
 # and 3.
@@ -133,7 +132,7 @@ class FeatureTest(unittest.TestCase):
         dest_dir = testdir.mkdir("features");
         for file in files:
             if os.path.isfile(file):
-                shutil.copy2(file, dest_dir)      
+                shutil.copy(file, dest_dir)      
         
 
     def run_feature_string(self, feature_string, pytest_args = None):
@@ -166,7 +165,7 @@ class FeatureTest(unittest.TestCase):
 
         if stream is None:       
             # redirects output
-            stream = TestWrapperIO()
+            stream = StreamTestWrapperIO()
 
         # Reset the state of callbacks and steps so that individual tests don't
         # affect each other

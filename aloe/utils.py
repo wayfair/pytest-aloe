@@ -46,9 +46,9 @@ def identifier(value):
 
 
 if PY3:
-    TestWrapperIO = io.StringIO  # pylint:disable=invalid-name
+    StreamTestWrapperIO = io.StringIO  # pylint:disable=invalid-name
 else:
-    class TestWrapperIO(io.StringIO):
+    class StreamTestWrapperIO(io.StringIO):
         """A wrapper for capturing Nose output in tests."""
 
         def write(self, str_):

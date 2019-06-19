@@ -402,15 +402,24 @@ def run_example(self):
         all_fixture_args = list(request._fixturemanager._arg2fixturedefs.keys()) if request else []
         # fill all fixture arguments and add it to existing step_kwargs
         step_fixture_args = [arg for arg in all_args if arg in all_fixture_args]
-        kwargs = { **step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args) }
+        
+        # Python > 3.5
+        # kwargs = { **step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args) }
+        args_dict = dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args)
+        kwargs = step_kwargs.copy()
+        kwargs.update(args_dict)
 
         # identity what arguments left and fill them from step arguments
         filled_args = kwargs.keys();        
         left_over_args = [arg for arg in all_args if arg not in filled_args]
 
-        kwargs = { **kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args)) }       
+        # Python > 3.5
+        # kwargs = { **kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args)) }       
+        args_dict = dict((arg, value) for arg, value in zip(left_over_args, step_args))
+        new_kwargs = kwargs.copy()
+        new_kwargs.update(args_dict)
 
-        return (), kwargs
+        return (), new_kwargs
 
     @classmethod
     def getFunctionRequest(cls, function_name):

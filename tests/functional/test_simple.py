@@ -23,7 +23,7 @@ from tests.testing import (
     FeatureTest,
     in_directory,
 )
-from aloe.utils import PY3, TestWrapperIO
+from aloe.utils import PY3, StreamTestWrapperIO
 
 # Pylint cannot infer the attributes on world
 # pylint:disable=no-member
@@ -69,7 +69,7 @@ class SimpleScenarioTest(FeatureTest):
         Check that the appropriate error messages are printed on failure.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations.feature'
 
@@ -77,10 +77,10 @@ class SimpleScenarioTest(FeatureTest):
 
         output = stream.getvalue()       
 
-        feature_stack_frame = f"""
+        feature_stack_frame = """
 >       Then the result should be 40 on the screen
 
-{failing_feature}:11:"""
+{failing_feature}:11:""".format(failing_feature)
 
         self.assertIn(feature_stack_frame, output)        
 
@@ -96,7 +96,7 @@ E       AssertionError: assert 30.0 == 40.0
         step background.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations_background.feature'
 
@@ -104,10 +104,10 @@ E       AssertionError: assert 30.0 == 40.0
 
         output = stream.getvalue()       
 
-        feature_stack_frame = f"""
+        feature_stack_frame = """
 {failing_feature}:11: in background
     Then the result should be 40 on the screen
-"""
+""".format(failing_feature)
         self.assertIn(feature_stack_frame, output)        
 
         step_stack_frame = """
@@ -122,7 +122,7 @@ E       AssertionError: assert 30.0 == 40.0
         Test that a failing feature in Chinese fails tests.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations_zh.feature'
 
@@ -133,18 +133,18 @@ E       AssertionError: assert 30.0 == 40.0
         output = stream.getvalue()
 
         if PY3:
-            feature_stack_frame = f"""
+            feature_stack_frame = """
 >       那么结果应该是40
 
 {failing_feature}:12:
-""".strip()
+""".strip().format(failing_feature)
 
             self.assertIn(feature_stack_frame, output)
         else:
             # Cannot use non-ASCII method names in Python 2
-            feature_stack_frame = f"""
+            feature_stack_frame = """
 {failing_feature}:12:
-            """
+            """.format(failing_feature)
 
             self.assertIn(feature_stack_frame, output)
 
@@ -161,7 +161,7 @@ E       AssertionError: assert 30.0 == 40.0
         Check the behavior when a step is not defined.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/step_not_found.feature'
 
@@ -179,7 +179,7 @@ E       AssertionError: assert 30.0 == 40.0
         Check the behavior when a step is not defined with a Chinese feature.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/step_not_found_zh.feature'
 
@@ -212,7 +212,7 @@ E       AssertionError: assert 30.0 == 40.0
         scenario outline.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations.feature'
 
@@ -220,11 +220,11 @@ E       AssertionError: assert 30.0 == 40.0
 
         output = stream.getvalue()        
         
-        feature_stack_frame = f"""
+        feature_stack_frame = """
 >         | 50     |
 
 {failing_feature}:22: 
-"""
+""".format(failing_feature)
 
         self.assertIn(feature_stack_frame, output)      
 
