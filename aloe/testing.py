@@ -220,5 +220,5 @@ class FeatureTest(unittest.TestCase):
 class TestResult(object):
     def __init__(self, result, stream):
         realpassed, realskipped, realfailed = result.listoutcomes();
-        self.success = len(realskipped) == 0 and len(realfailed) == 0 and len(realpassed) > 0
+        self.success = len(realskipped) == 0 and len(realfailed) == 0
         self.captured_stream = stream        

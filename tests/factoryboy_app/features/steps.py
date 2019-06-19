@@ -15,8 +15,6 @@ import factory
 from aloe import step, after
 from aloe.tools import guess_types
 from aloe.steps.factoryboy import step_from_factory
-from nose.tools import assert_equal
-
 
 class User(object):
     """A user"""
@@ -50,7 +48,7 @@ def count_users(self, nusers):
     """Test the number of users I have made"""
 
     nusers = guess_types(nusers)
-    assert_equal(nusers, len(User.users))
+    assert nusers == len(User.users)
 
 
 @step('the user list contains')
@@ -65,7 +63,7 @@ def check_users(self):
 
     print(actual)
 
-    assert_equal(expected, actual)
+    assert expected == actual
 
 
 @after.each_example
@@ -124,7 +122,7 @@ def count_agencies(self, nagencies):
     """Test the number of agencies I have made"""
 
     nagencies = guess_types(nagencies)
-    assert_equal(nagencies, len(Agency.agencies))
+    assert nagencies == len(Agency.agencies)
 
 
 @step('the agency list contains')
@@ -138,7 +136,7 @@ def check_agencies(self):
 
     print(actual)
 
-    assert_equal(expected, actual)
+    assert expected == actual
 
 
 @after.each_example
@@ -178,4 +176,4 @@ def check_types(self):
                         ('none', type(None)),
                         ('bool', bool),
                         ('date', date)):
-        assert_equal(type(getattr(MyWeirdObject.ref, attr)), type_)
+        assert type(getattr(MyWeirdObject.ref, attr)) == type_

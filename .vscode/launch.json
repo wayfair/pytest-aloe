@@ -16,7 +16,7 @@
                 "tests/functional",
                 "-vvv",
                 "-k",
-                "test_scenario_indices"                
+                "test_factoryboy"                
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

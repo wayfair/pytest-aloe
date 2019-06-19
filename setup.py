@@ -36,6 +36,10 @@ if __name__ == '__main__':
                 ],
             },
 
+            extras_require={
+                'tests_require': test_requirements.readlines(),
+            },
+
             setup_requires=['setuptools_scm'],
 
             install_requires=requirements.readlines(),

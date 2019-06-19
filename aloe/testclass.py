@@ -270,6 +270,12 @@ def run_example(self):
         # for tag in scenario.tags:
         #     method = attr(tag)(method)
 
+        for tag in scenario.tags:
+            if (tag not in pytest.mark._markers):
+                pytest.mark._markers.add(tag)
+            decorator = pytest.mark.__getattr__(tag)
+            method = decorator(method)
+
         return method
 
     @classmethod
