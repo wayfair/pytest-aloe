@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division,
 from builtins import *
 # pylint:enable=redefined-builtin, unused-wildcard-import, wildcard-import
 
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )

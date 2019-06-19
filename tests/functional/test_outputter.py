@@ -13,7 +13,7 @@ import os
 from contextlib import contextmanager
 
 # from aloe.result import Terminal
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )

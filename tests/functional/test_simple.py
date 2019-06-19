@@ -19,7 +19,7 @@ from inspect import getsourcefile
 from aloe import world
 from aloe.exceptions import StepDiscoveryError
 
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )

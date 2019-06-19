@@ -14,7 +14,7 @@ import pytest
 
 from aloe import world
 from aloe.testclass import TestCase
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )

@@ -15,7 +15,7 @@ from builtins import zip
 
 from aloe.parser import Feature, Scenario, Background
 from aloe.exceptions import AloeSyntaxError
-from aloe.testing import named_temporary_file
+from tests.testing import named_temporary_file
 
 import pytest
 import os
