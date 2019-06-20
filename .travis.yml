@@ -1,51 +1,6 @@
-dist: xenial
-
-language: python
-
-matrix:
-  include:
-    - python: "3.7"
-      env: PYLINT_FLAGS=
-    - python: "3.6"
-      env: PYLINT_FLAGS=
-    - python: "3.5"
-      env: PYLINT_FLAGS=
-    - python: "3.4"
-      env: PYLINT_FLAGS=
-    - python: "2.7"
-      env: PYLINT_FLAGS="--disable bad-continuation"
-
-install:
-    - pip install -r requirements.txt
-    - pip install -r test_requirements.txt
-    - pip install --upgrade pycodestyle pylint
-    - pip install coveralls
-
-cache:
-    directories:
-        - $HOME/virtualenv
-
-script:
-    - pycodestyle .
-    - pylint $PYLINT_FLAGS aloe aloe_sphinx tests
-    - coverage erase
-    - coverage run -m pytest
-    - coverage report
-    - ./tools/check_installs
-    - make -C docs coverage
-
-after_success:
-    - coveralls
-
 sudo: false
-
-deploy:
-    provider: pypi
-    user: koterpillar
-    password:
-        secure: "PVNJN8mqJTiJhvSXDC0oi8GZwOySl8o8tAzrsiqk4uNkRwBAciHnUGSnAtt92SBC4eQmrxsnjhxCdfXOVA+SxaVoUBEnIu233EE0/k+ylueiv3VI305iBZWG2Vf0ioISCm2Mxc3Ec9ujwbwFQWXFxUHydNG9PZRjbupVF7Bnn0c="
-    on:
-        tags: true
-        all_branches: true
-        python: 3.5
-        condition: "\"$TRAVIS_TAG\" = \"v$(python setup.py --version)\""
+language: python
+python:    
+    - "3.7"
+install: pip install tox-travis
+script: tox
