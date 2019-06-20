@@ -7,8 +7,10 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
 # pylint:disable=redefined-builtin,wildcard-import,unused-wildcard-import
 from builtins import *
+
 # pylint:enable=redefined-builtin,wildcard-import,unused-wildcard-import
 
 import os
@@ -32,7 +34,7 @@ from aloe.utils import memoizedproperty
 class LanguageTokenMatcher(TokenMatcher):
     """Gherkin 3 token matcher that always uses the given language."""
 
-    def __init__(self, dialect_name='en'):
+    def __init__(self, dialect_name="en"):
         self.actual_dialect_name = dialect_name
         super().__init__(dialect_name=dialect_name)
 
@@ -44,7 +46,7 @@ class LanguageTokenMatcher(TokenMatcher):
 def cell_values(row):
     """Extract cell values from a table header or row."""
 
-    return tuple(cell['value'] for cell in row['cells'])
+    return tuple(cell["value"] for cell in row["cells"])
 
 
 class Node(object):
@@ -54,8 +56,8 @@ class Node(object):
 
     def __init__(self, parsed, filename=None):
         """Construct the node from Gherkin parse results."""
-        self.line = parsed['location']['line']
-        self.col = parsed['location']['column']
+        self.line = parsed["location"]["line"]
+        self.col = parsed["location"]["column"]
         self.filename = filename
 
     @property
@@ -68,10 +70,7 @@ class Node(object):
     def location(self):
         """Location as 'filename:line'"""
 
-        return '{filename}:{line}'.format(
-            filename=os.path.relpath(self.filename),
-            line=self.line,
-        )
+        return "{filename}:{line}".format(filename=os.path.relpath(self.filename), line=self.line)
 
     @property
     def text(self):
@@ -84,7 +83,7 @@ class Node(object):
     def represented(self):
         """A representation of the node."""
 
-        result = ' ' * self.indent + self.text.strip()
+        result = " " * self.indent + self.text.strip()
 
         return result
 
@@ -144,25 +143,21 @@ class Step(Node):
         elif scenario:
             self.scenario = scenario
         else:
-            raise ValueError(
-                "Step must belong to either a scenario or a background.")
+            raise ValueError("Step must belong to either a scenario or a background.")
 
-        self.sentence = parsed['keyword'] + parsed['text']
+        self.sentence = parsed["keyword"] + parsed["text"]
         """The sentence parsed for this step."""
 
         try:
-            argument_type = parsed['argument']['type']
+            argument_type = parsed["argument"]["type"]
         except KeyError:
             argument_type = None
 
-        if argument_type == 'DataTable':
-            self.table = tuple(
-                cell_values(row)
-                for row in parsed['argument']['rows']
-            )
+        if argument_type == "DataTable":
+            self.table = tuple(cell_values(row) for row in parsed["argument"]["rows"])
 
-        elif argument_type == 'DocString':
-            self.multiline = parsed['argument']['content']
+        elif argument_type == "DocString":
+            self.multiline = parsed["argument"]["content"]
 
     @property
     def text(self):
@@ -192,12 +187,10 @@ class Step(Node):
 
         try:
             self.scenario  # pylint:disable=pointless-statement
-            container_text = \
-                '%s: scenario' % self.feature.dialect.scenario_keywords[0]
+            container_text = "%s: scenario" % self.feature.dialect.scenario_keywords[0]
             is_scenario = True
         except AttributeError:
-            container_text = \
-                '%s: ' % self.feature.dialect.background_keywords[0]
+            container_text = "%s: " % self.feature.dialect.background_keywords[0]
             is_scenario = False
 
         # Gherkin can't parse anything other than complete features
@@ -208,13 +201,10 @@ class Step(Node):
         {container_text}
         {string}
         """.format(
-            container_text=container_text,
-            feature=self.feature,
-            string=string,
+            container_text=container_text, feature=self.feature, string=string
         )
 
-        feature = self.feature.parse(string=feature_string,
-                                     filename=self.filename)
+        feature = self.feature.parse(string=feature_string, filename=self.filename)
 
         if is_scenario:
             return feature.scenarios[0].steps
@@ -268,10 +258,7 @@ class Step(Node):
 
         keys = self.keys
 
-        return tuple(
-            dict(zip(keys, row))
-            for row in self.table[1:]
-        )
+        return tuple(dict(zip(keys, row)) for row in self.table[1:])
 
     @memoizedproperty
     def max_length(self):
@@ -281,10 +268,8 @@ class Step(Node):
 
         return max(
             0,
-            strings.get_terminal_width(self.represented(table=False,
-                                                        multiline=False)),
-            *[strings.get_terminal_width(line)
-              for line in self.represent_table().splitlines()]
+            strings.get_terminal_width(self.represented(table=False, multiline=False)),
+            *[strings.get_terminal_width(line) for line in self.represent_table().splitlines()]
         )
 
     indent = 4
@@ -303,7 +288,8 @@ class Step(Node):
         if multiline and self.multiline:
             lines.append(self.represent_multiline(string_wrap=color))
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
+
     # pylint:enable=arguments-differ
 
     def represent_table(self, **kwargs):
@@ -313,8 +299,7 @@ class Step(Node):
         :param cell_wrap: color to use inside the table cells
         """
 
-        return strings.represent_table(
-            self.table, indent=self.indent + 2, **kwargs)
+        return strings.represent_table(self.table, indent=self.indent + 2, **kwargs)
 
     def represent_multiline(self, string_wrap=str):
         """
@@ -325,12 +310,11 @@ class Step(Node):
 
         indent = self.indent + 2
 
-        lines = [' ' * indent + '"""']
-        lines += [' ' * indent + string_wrap(line)
-                  for line in self.multiline.splitlines()]
-        lines += [' ' * indent + '"""']
+        lines = [" " * indent + '"""']
+        lines += [" " * indent + string_wrap(line) for line in self.multiline.splitlines()]
+        lines += [" " * indent + '"""']
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def resolve_substitutions(self, outline):
         """
@@ -342,7 +326,7 @@ class Step(Node):
         def replace_vars(string):
             """Replace all the variables in a string."""
             for key, value in outline.items():
-                key = '<{key}>'.format(key=key)
+                key = "<{key}>".format(key=key)
                 string = string.replace(key, value)
             return string
 
@@ -352,13 +336,7 @@ class Step(Node):
             replaced.multiline = replace_vars(self.multiline)
 
         if self.table:
-            replaced.table = tuple(
-                tuple(
-                    replace_vars(cell)
-                    for cell in row
-                )
-                for row in self.table
-            )
+            replaced.table = tuple(tuple(replace_vars(cell) for cell in row) for row in self.table)
 
         replaced.outline = outline
 
@@ -371,18 +349,11 @@ class Step(Node):
         """
 
         dialect = self.feature.dialect
-        keywords = {
-            'given': dialect.given_keywords,
-            'when': dialect.when_keywords,
-            'then': dialect.then_keywords,
-        }[kind]
+        keywords = {"given": dialect.given_keywords, "when": dialect.when_keywords, "then": dialect.then_keywords}[kind]
 
         # Gherkin allows '*' as a keyword; skip it to be sure the keyword is
         # specifically for the given kind
-        return next(
-            keyword for keyword in keywords
-            if not keyword.startswith('*')
-        )
+        return next(keyword for keyword in keywords if not keyword.startswith("*"))
 
 
 class StepContainer(Node):
@@ -390,7 +361,7 @@ class StepContainer(Node):
 
     step_class = Step
 
-    container_name = 'container'  # override in subclasses
+    container_name = "container"  # override in subclasses
 
     @property
     def feature(self):
@@ -404,10 +375,7 @@ class StepContainer(Node):
         # Put a reference to the parent node into all the steps
         parent_ref = {self.container_name: self}
 
-        self.steps = tuple(
-            self.step_class(step, filename=filename, **parent_ref)
-            for step in parsed['steps']
-        )
+        self.steps = tuple(self.step_class(step, filename=filename, **parent_ref) for step in parsed["steps"])
 
     indent = 2
 
@@ -420,21 +388,19 @@ class HeaderNode(Node):
     def __init__(self, parsed, **kwargs):
         super().__init__(parsed, **kwargs)
 
-        self.keyword = parsed['keyword']
-        self.name = parsed['name'].strip()
+        self.keyword = parsed["keyword"]
+        self.name = parsed["name"].strip()
 
-        if self.name_required and self.name == '':
+        if self.name_required and self.name == "":
             raise AloeSyntaxError(
                 self.filename,
                 "{line}:{col} {klass} must have a name".format(
-                    line=self.line,
-                    col=self.col,
-                    klass=self.__class__.__name__))
+                    line=self.line, col=self.col, klass=self.__class__.__name__
+                ),
+            )
 
     def __str__(self):
-        return '<{klass}: "{name}">'.format(
-            klass=self.__class__.__name__,
-            name=self.name)
+        return '<{klass}: "{name}">'.format(klass=self.__class__.__name__, name=self.name)
 
     def __repr__(self):
         return str(self)
@@ -443,8 +409,7 @@ class HeaderNode(Node):
     def text(self):
         """The text for this block."""
 
-        return '{keyword}: {name}'.format(keyword=self.keyword,
-                                          name=self.name).strip()
+        return "{keyword}: {name}".format(keyword=self.keyword, name=self.name).strip()
 
 
 class TaggedNode(Node):
@@ -453,9 +418,7 @@ class TaggedNode(Node):
     def __init__(self, parsed, **kwargs):
         super().__init__(parsed, **kwargs)
 
-        self._tags = tuple(
-            tag['name'][1:] for tag in parsed['tags']
-        )
+        self._tags = tuple(tag["name"][1:] for tag in parsed["tags"])
 
     @property
     def tags(self):
@@ -476,12 +439,13 @@ class TaggedNode(Node):
         Render the tags of a tagged block.
         """
 
-        return ' ' * self.indent + '  '.join('@%s' % tag for tag in self.tags)
+        return " " * self.indent + "  ".join("@%s" % tag for tag in self.tags)
 
 
 class Background(HeaderNode, StepContainer):
     """The background of all :class:`Scenario` in a :class:`Feature`."""
-    container_name = 'background'
+
+    container_name = "background"
     name_required = False
 
 
@@ -501,7 +465,7 @@ class Outline(OrderedDict, Node):
 class Scenario(HeaderNode, TaggedNode, StepContainer):
     """A scenario within a :class:`Feature`."""
 
-    container_name = 'scenario'
+    container_name = "scenario"
 
     def __init__(self, parsed, **kwargs):
         super().__init__(parsed, **kwargs)
@@ -511,14 +475,11 @@ class Scenario(HeaderNode, TaggedNode, StepContainer):
         # token is a list of table tokens
         self.outlines = ()
 
-        for example_table in parsed.get('examples', ()):
+        for example_table in parsed.get("examples", ()):
             # the first row of the table is the column headings
-            keys = cell_values(example_table['tableHeader'])
+            keys = cell_values(example_table["tableHeader"])
 
-            self.outlines += tuple(
-                Outline(keys, row)
-                for row in example_table['tableBody']
-            )
+            self.outlines += tuple(Outline(keys, row) for row in example_table["tableBody"])
 
     indent = 2
 
@@ -527,8 +488,7 @@ class Scenario(HeaderNode, TaggedNode, StepContainer):
         Render the outlines table.
         """
 
-        return strings.represent_table(
-            self.outlines_table, indent=self.indent + 2)
+        return strings.represent_table(self.outlines_table, indent=self.indent + 2)
 
     @memoizedproperty
     def max_length(self):
@@ -539,9 +499,10 @@ class Scenario(HeaderNode, TaggedNode, StepContainer):
         return max(
             0,
             strings.get_terminal_width(self.represented()),
-            *([step.max_length for step in self.steps]
-              + [strings.get_terminal_width(line)
-                 for line in self.represent_outlines().splitlines()])
+            *(
+                [step.max_length for step in self.steps]
+                + [strings.get_terminal_width(line) for line in self.represent_outlines().splitlines()]
+            )
         )
 
     @memoizedproperty
@@ -561,7 +522,7 @@ class Scenario(HeaderNode, TaggedNode, StepContainer):
 
         # append the data to the table
         for outline in self.outlines:
-            table.append([outline.get(cell, '') for cell in headings])
+            table.append([outline.get(cell, "") for cell in headings])
 
         return table
 
@@ -577,8 +538,7 @@ class Scenario(HeaderNode, TaggedNode, StepContainer):
         """
 
         for outline in self.outlines:
-            steps = [step.resolve_substitutions(outline)
-                     for step in self.steps]
+            steps = [step.resolve_substitutions(outline) for step in self.steps]
 
             # set a backref to the scenario
             for step in steps:
@@ -595,11 +555,11 @@ class Description(Node):
     def __init__(self, parsed, **kwargs):
         super().__init__(parsed, **kwargs)
 
-        description = parsed.get('description', '')
-        self.lines = tuple(line.strip() for line in description.split('\n'))
+        description = parsed.get("description", "")
+        self.lines = tuple(line.strip() for line in description.split("\n"))
 
     def __str__(self):
-        return '\n'.join(self.lines)
+        return "\n".join(self.lines)
 
     def __repr__(self):
         return str(self)
@@ -607,10 +567,7 @@ class Description(Node):
     indent = 2
 
     def represented(self):
-        return '\n'.join(
-            self.represent_line(n)
-            for n, _ in enumerate(self.lines)
-        )
+        return "\n".join(self.represent_line(n) for n, _ in enumerate(self.lines))
 
     def represent_line(self, idx):
         """
@@ -619,9 +576,9 @@ class Description(Node):
 
         line = self.lines[idx]
         if line:
-            result = ' ' * self.indent + line
+            result = " " * self.indent + line
         else:
-            result = ''
+            result = ""
 
         return result
 
@@ -633,8 +590,7 @@ class Description(Node):
 
         offset = self.line
 
-        return tuple(offset + lineno for lineno, _
-                     in enumerate(self.lines))
+        return tuple(offset + lineno for lineno, _ in enumerate(self.lines))
 
     @memoizedproperty
     def max_length(self):
@@ -642,10 +598,7 @@ class Description(Node):
         The maximum length of all description lines.
         """
         try:
-            return max(
-                strings.get_terminal_width(self.represent_line(n))
-                for n, _ in enumerate(self.lines)
-            )
+            return max(strings.get_terminal_width(self.represent_line(n)) for n, _ in enumerate(self.lines))
         except ValueError:
             return 0
 
@@ -666,29 +619,24 @@ class Feature(HeaderNode, TaggedNode):
     def __init__(self, parsed, filename=None, **kwargs):
         # Gherkin's top level definition is a GherkinDocument, which doesn't
         # have a location
-        parsed = parsed['feature']
+        parsed = parsed["feature"]
         super().__init__(parsed, filename=filename, **kwargs)
 
-        self.language = parsed['language']
+        self.language = parsed["language"]
 
         self.description_node = Description(parsed, filename=filename)
 
         scenarios = []
 
-        for child in parsed['children']:
-            if child['type'] == 'Background':
+        for child in parsed["children"]:
+            if child["type"] == "Background":
                 # Gherkin syntax disallows multiple backgrounds
                 assert not self.background, "Duplicate background found."
-                self.background = self.background_class(child,
-                                                        filename=filename,
-                                                        feature=self)
+                self.background = self.background_class(child, filename=filename, feature=self)
             else:
                 scenarios.append(child)
 
-        self.scenarios = tuple(
-            self.scenario_class(scenario, filename=filename, feature=self)
-            for scenario in scenarios
-        )
+        self.scenarios = tuple(self.scenario_class(scenario, filename=filename, feature=self) for scenario in scenarios)
 
     @classmethod
     def parse(cls, string=None, filename=None, language=None):
@@ -698,17 +646,14 @@ class Feature(HeaderNode, TaggedNode):
 
         parser = Parser()
         if language:
-            if language == 'pt-br':
-                language = 'pt'
+            if language == "pt-br":
+                language = "pt"
             token_matcher = LanguageTokenMatcher(language)
         else:
             token_matcher = TokenMatcher()
 
         try:
-            return cls(
-                parser.parse(string or filename, token_matcher=token_matcher),
-                filename=filename,
-            )
+            return cls(parser.parse(string or filename, token_matcher=token_matcher), filename=filename)
         except ParserError as ex:
             raise AloeSyntaxError(filename, str(ex))
 
@@ -762,8 +707,7 @@ class Feature(HeaderNode, TaggedNode):
 
         return max(
             0,
-            strings.get_terminal_width(
-                self.represented(description=False)),
+            strings.get_terminal_width(self.represented(description=False)),
             self.description_node.max_length,
             *[scenario.max_length for scenario in self.scenarios]
         )
@@ -772,8 +716,8 @@ class Feature(HeaderNode, TaggedNode):
     def represented(self, description=True):
         result = super().represented()
 
-        if description and self.description != '':
-            result += '\n'
+        if description and self.description != "":
+            result += "\n"
             result += self.description_node.represented()
 
         return result

@@ -10,40 +10,23 @@ from __future__ import absolute_import
 
 import sys
 import os
+import unittest
 from contextlib import contextmanager
 from inspect import getsourcefile
 
-from nose.importer import Importer
+# from nose.importer import Importer
 
 from aloe import world
 from aloe.exceptions import StepDiscoveryError
 
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )
-from aloe.utils import PY3, TestWrapperIO
+from aloe.utils import PY3, StreamTestWrapperIO
 
 # Pylint cannot infer the attributes on world
 # pylint:disable=no-member
-
-
-@contextmanager
-def empty_file(name):
-    """
-    Create an empty file with the given name that is removed on exiting the
-    context manager.
-    """
-
-    try:
-        file_ = open(name, 'w')
-        file_.close()
-        yield
-    finally:
-        try:
-            os.unlink(name)
-        except OSError:
-            pass
 
 
 @in_directory('tests/simple_app')
@@ -76,7 +59,7 @@ class SimpleScenarioTest(FeatureTest):
     def step_module_filename(self, module_name):
         """The file name corresponding to the steps module."""
 
-        Importer().importFromDir('.', module_name)
+        # Importer().importFromDir('.', module_name)
         module = getsourcefile(sys.modules[module_name])
         del sys.modules[module_name]
         return module
@@ -86,34 +69,25 @@ class SimpleScenarioTest(FeatureTest):
         Check that the appropriate error messages are printed on failure.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations.feature'
 
-        self.assert_feature_fail(failing_feature, '-n', '1', stream=stream)
+        self.assert_feature_fail(failing_feature, '--scenario-indices', '1', stream=stream)
 
-        output = stream.getvalue()
+        output = stream.getvalue()       
 
-        error_header = "FAIL: Fail at adding " + \
-            "(features.wrong_expectations: Wrong expectations)"
+        feature_stack_frame = f"""
+>       Then the result should be 40 on the screen
 
-        self.assertIn(error_header, output)
+{failing_feature}:11:"""
 
-        feature_stack_frame = """
-  File "{feature}", line 11, in Fail at adding
-    Then the result should be 40 on the screen
-        """.strip().format(feature=os.path.abspath(failing_feature))
-
-        self.assertIn(feature_stack_frame, output)
-
-        step_file = self.step_module_filename('features.steps')
+        self.assertIn(feature_stack_frame, output)        
 
         step_stack_frame = """
-  File "{step_file}", line 62, in assert_result
-    assert world.result == float(result)
-AssertionError
-        """.strip().format(step_file=step_file)
-
+>       assert world.result == float(result)
+E       AssertionError: assert 30.0 == 40.0
+"""
         self.assertIn(step_stack_frame, output)
 
     def test_error_message_background(self):
@@ -122,33 +96,24 @@ AssertionError
         step background.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations_background.feature'
 
-        self.assert_feature_fail(failing_feature, '-n', '1', stream=stream)
+        self.assert_feature_fail(failing_feature, '--scenario-indices', '1', stream=stream)
 
-        output = stream.getvalue()
+        output = stream.getvalue()       
 
-        error_header = "FAIL: Never reached " + \
-            "(features.wrong_expectations_background: Wrong expectations)"
-
-        self.assertIn(error_header, output)
-
-        feature_stack_frame = """
-  File "{feature}", line 11, in background
+        feature_stack_frame = f"""
+{failing_feature}:11: in background
     Then the result should be 40 on the screen
-        """.strip().format(feature=os.path.abspath(failing_feature))
-
-        self.assertIn(feature_stack_frame, output)
-
-        step_file = self.step_module_filename('features.steps')
+"""
+        self.assertIn(feature_stack_frame, output)        
 
         step_stack_frame = """
-  File "{step_file}", line 62, in assert_result
-    assert world.result == float(result)
-AssertionError
-        """.strip().format(step_file=step_file)
+>       assert world.result == float(result)
+E       AssertionError: assert 30.0 == 40.0
+"""
 
         self.assertIn(step_stack_frame, output)
 
@@ -157,7 +122,7 @@ AssertionError
         Test that a failing feature in Chinese fails tests.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations_zh.feature'
 
@@ -167,36 +132,27 @@ AssertionError
 
         output = stream.getvalue()
 
-        error_header = "FAIL: 添加两个数值 " + \
-            "(features.wrong_expectations_zh: 不对的预期)"
-
-        self.assertIn(error_header, output)
-
         if PY3:
-            feature_stack_frame = """
-  File "{feature}", line 12, in 添加两个数值
-    那么结果应该是40
-            """.strip().format(feature=os.path.abspath(failing_feature))
+            feature_stack_frame = f"""
+>       那么结果应该是40
+
+{failing_feature}:12:
+""".strip()
 
             self.assertIn(feature_stack_frame, output)
         else:
             # Cannot use non-ASCII method names in Python 2
-            feature_stack_frame = """
-  File "{feature}", line 12, in
-            """.strip().format(feature=os.path.abspath(failing_feature))
+            feature_stack_frame = f"""
+{failing_feature}:12:
+            """
 
             self.assertIn(feature_stack_frame, output)
 
-            feature_code_line = "那么结果应该是40"
-            self.assertIn(feature_code_line, output)
-
-        step_file = self.step_module_filename('features.steps')
 
         step_stack_frame = """
-  File "{step_file}", line 62, in assert_result
-    assert world.result == float(result)
-AssertionError
-        """.strip().format(step_file=step_file)
+>       assert world.result == float(result)
+E       AssertionError: assert 30.0 == 40.0
+""".strip()
 
         self.assertIn(step_stack_frame, output)
 
@@ -205,7 +161,7 @@ AssertionError
         Check the behavior when a step is not defined.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/step_not_found.feature'
 
@@ -223,7 +179,7 @@ AssertionError
         Check the behavior when a step is not defined with a Chinese feature.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/step_not_found_zh.feature'
 
@@ -256,42 +212,26 @@ AssertionError
         scenario outline.
         """
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         failing_feature = 'features/wrong_expectations.feature'
 
-        self.assert_feature_fail(failing_feature, '-n', '2', stream=stream)
+        self.assert_feature_fail(failing_feature, '--scenario-indices', '2', stream=stream)
 
-        output = stream.getvalue()
+        output = stream.getvalue()        
+        
+        feature_stack_frame = f"""
+>         | 50     |
 
-        error_header = "FAIL: Fail repeatedly " + \
-            "(features.wrong_expectations: Wrong expectations)"
+{failing_feature}:22: 
+"""
 
-        self.assertIn(error_header, output)
-
-        # TODO: Why isn't the line indented with 6 spaces like in the file?
-        feature_stack_frame = """
-  File "{feature}", line 22, in Fail repeatedly: Example 1
-    | 50     |
-        """.strip().format(feature=os.path.abspath(failing_feature))
-
-        self.assertIn(feature_stack_frame, output)
-
-        example_stack_frame = """
-  File "{feature}", line 18, in Fail repeatedly
-    Then the result should be <result> on the screen
-        """.strip().format(feature=os.path.abspath(failing_feature))
-
-        self.assertIn(example_stack_frame, output)
-
-        step_file = self.step_module_filename('features.steps')
+        self.assertIn(feature_stack_frame, output)      
 
         step_stack_frame = """
-  File "{step_file}", line 62, in assert_result
-    assert world.result == float(result)
-AssertionError
-        """.strip().format(step_file=step_file)
-
+>       assert world.result == float(result)
+E       AssertionError: assert 30.0 == 50.0
+"""
         self.assertIn(step_stack_frame, output)
 
     def test_python_test_skipped(self):
@@ -300,24 +240,7 @@ AssertionError
         """
 
         self.assert_feature_success('tests')
-
-    def test_non_ascii_files(self):
-        """
-        Test that features are loaded from a directory also containing a file
-        with non-ASCII characters in the name.
-        """
-
-        # Nose behavior depends on whether there's __init__.py in the directory
-
-        # Files with non-ASCII names are created on the fly rather than checked
-        # in to keep the distribution installable regardless of the system
-        # encoding. The file names are encoded using UTF-8 which causes
-        # problems even logging them when installing on Windows systems.
-
-        with empty_file('features/non_ascii_files/tmp_file_奇怪的文件'):
-            self.assert_feature_success('features/non_ascii_files')
-        with empty_file('features/non_ascii_files_2/tmp_file_странный_файл'):
-            self.assert_feature_success('features/non_ascii_files_2')
+   
 
     def test_scenario_indices(self):
         """
@@ -327,51 +250,51 @@ AssertionError
         feature = 'features/scenario_index.feature'
 
         # Run a single scenario
-        self.assert_feature_success(feature, '-n', '1')
+        self.assert_feature_success(feature, '--scenario-indices', '1')
         self.assertEqual(world.all_results, [10])
 
         # Run multiple scenarios
         # TODO: Handling multi-valued options in Nose is tricky
-        self.assert_feature_success(feature, '-n', '1,2')
+        self.assert_feature_success(feature, '--scenario-indices', '1,2')
         self.assertEqual(world.all_results, [10, 20])
 
         # Run a scenario outline
-        self.assert_feature_success(feature, '-n', '3')
+        self.assert_feature_success(feature, '--scenario-indices', '3')
         self.assertEqual(world.all_results, [30, 40])
 
     def test_tags(self):
         """
         Test specifying the tags to run.
         """
+        
+        feature_one = 'features/withtags_one.feature'
+        feature_two = 'features/withtags_two.feature'        
 
-        feature_dir = 'features/with_tags'
-        feature_one = 'features/with_tags/one.feature'
 
         # Run scenarios by tag
-        self.assert_feature_success(feature_one, '-a', 'hana')
+        self.assert_feature_success(feature_one, '-m', 'hana')
         self.assertEqual(world.all_results, [1, 11, 22])
 
         # Run scenarios with a tag that's not there
-        self.assert_feature_success(feature_one, '-a', 'set')
-        self.assertEqual(world.all_results, [])
+        self.assert_feature_success(feature_one, '-m', 'set')        
 
         # Run features and scenarios with the tag
-        self.assert_feature_success(feature_dir, '-a', 'dul')
+        self.assert_feature_success(feature_one, feature_two, '-m', 'dul')
         self.assertEqual(world.all_results, [2, 13, 20, 200])
 
         # Specify a tag to exclude
-        self.assert_feature_success(feature_one, '-a', '!hana')
+        self.assert_feature_success(feature_one, '-m', 'not hana')
         self.assertEqual(world.all_results, [2, 4])
 
         # Specify more than one tag to run
-        self.assert_feature_success(feature_one, '-a', 'hana', '-a', 'dul')
+        self.assert_feature_success(feature_one, '-m', 'hana or dul')
         self.assertEqual(world.all_results, [1, 2, 11, 22])
 
         # Specify more than one tag to exclude
-        self.assert_feature_success(feature_dir, '-a', '!hana,!dul')
+        self.assert_feature_success(feature_one, feature_two, '-m', 'not hana and not dul')
         self.assertEqual(world.all_results, [4])
 
-
+@unittest.skip("The test is no longer valid. All steps should be written/referenced in conftest.py")
 class BadStepsTest(FeatureTest):
     """
     Test loading an application with an error in a step definition file.

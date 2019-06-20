@@ -12,13 +12,14 @@ from builtins import *
 import os
 from contextlib import contextmanager
 
-from aloe.result import Terminal
-from aloe.testing import (
+# from aloe.result import Terminal
+from tests.testing import (
     FeatureTest,
     in_directory,
 )
-from aloe.utils import TestWrapperIO
-from mock import patch
+from aloe.utils import StreamTestWrapperIO
+# from mock import patch
+import unittest
 
 
 class MockTermElement(object):
@@ -44,16 +45,17 @@ class MockTermElement(object):
         return str(self) * other
 
 
-class MockTerminal(Terminal):
-    """Mock terminal to output printable elements instead of ANSI sequences"""
+# class MockTerminal(Terminal):
+#     """Mock terminal to output printable elements instead of ANSI sequences"""
 
-    def colored(self, color):
-        return MockTermElement(color)
+#     def colored(self, color):
+#         return MockTermElement(color)
 
-    move_up = MockTermElement('move_up')
+#     move_up = MockTermElement('move_up')
 
 
 @in_directory('tests/simple_app')
+@unittest.skip("The test is no longer valid since pytest_eucalyptus will use standard pytest Terminal Reporter.")
 class OutputterTest(FeatureTest):
     """
     Test level 3 outputter
@@ -66,7 +68,7 @@ class OutputterTest(FeatureTest):
     def test_uncolored_output(self):
         """Test streamed output"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with patch('aloe.result.AloeTestResult.printSummary'):
             self.run_features(self.feature, verbosity=3, stream=stream)
@@ -122,7 +124,7 @@ Feature: Highlighting
     def test_color_output(self):
         """Test streamed output with color"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with \
                 patch('aloe.result.Terminal', new=MockTerminal), \
@@ -195,7 +197,7 @@ t.green(Given I have a table:)
     def test_customized_color_output(self):
         """Test streamed color output with overridden colors."""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with self.environment_override('CUCUMBER_COLORS',
                                        'failed=magenta:passed=blue'):
@@ -257,7 +259,7 @@ t.blue(Given I have a table:)
     def test_tty_output(self):
         """Test streamed output with tty control codes"""
 
-        stream = TestWrapperIO()
+        stream = StreamTestWrapperIO()
 
         with \
                 patch('aloe.result.Terminal', new=MockTerminal) as mock_term, \

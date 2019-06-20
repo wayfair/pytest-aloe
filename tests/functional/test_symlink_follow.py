@@ -8,14 +8,16 @@ from __future__ import division
 from __future__ import absolute_import
 
 import os
+import unittest
 
-from aloe.testing import (
+from tests.testing import (
     FeatureTest,
     in_directory,
 )
 
 
 @in_directory('tests/symlink_follow_app/working_path')
+@unittest.skip("The test is no longer valid. All steps should be written/referenced in conftest.py")
 class SymlinkLoadingTest(FeatureTest):
     """
     Test that symlink feature is discovered and evaluated.

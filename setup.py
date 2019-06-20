@@ -11,12 +11,12 @@ if __name__ == '__main__':
             open('test_requirements.txt') as test_requirements, \
             io.open('README.md', encoding='utf-8') as readme:
         setup(
-            name='aloe',
+            name='pytest-eucalyptus',
             use_scm_version=True,
             description='Gherkin runner compatible with Lettuce',
-            author='Alexey Kotlyarov',
-            author_email='a@koterpillar.com',
-            url='https://github.com/aloetesting/aloe',
+            author='Dennis Miasoutov',
+            author_email='dmiasoutov@wayfair.com',
+            url='https://github.com/wayfair/pytest_eucalyptus',
             long_description=readme.read(),
             classifiers=[
                 'License :: OSI Approved :: '
@@ -24,18 +24,20 @@ if __name__ == '__main__':
                 'Programming Language :: Python',
                 'Programming Language :: Python :: 2',
                 'Programming Language :: Python :: 3',
+                'Framework :: Pytest',
             ],
 
             packages=find_packages(exclude=['tests']),
             include_package_data=True,
 
             entry_points={
-                'nose.plugins.0.10': [
-                    'aloe = aloe.plugin:GherkinPlugin',
+                'pytest11': [
+                    'pytest_eucalyptus = pytest_eucalyptus.plugin',
                 ],
-                'console_scripts': [
-                    'aloe = aloe:main',
-                ],
+            },
+
+            extras_require={
+                'tests_require': test_requirements.readlines(),
             },
 
             setup_requires=['setuptools_scm'],

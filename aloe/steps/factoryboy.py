@@ -12,10 +12,11 @@ To activate these steps import :mod:`aloe.steps.factoryboy` into your
 .. _factory_boy: https://factoryboy.readthedocs.io/en/latest/
 """
 
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 # pylint:disable=redefined-builtin, unused-wildcard-import, wildcard-import
 from builtins import *
+
 # pylint:enable=redefined-builtin, unused-wildcard-import, wildcard-import
 
 import re
@@ -34,10 +35,7 @@ def _run_factory(factory, self, count=None):
 
     if self.table:
         headers = self.table[0]
-        rows = tuple(
-            dict(zip(headers, row))
-            for row in guess_types(self.table[1:])
-        )
+        rows = tuple(dict(zip(headers, row)) for row in guess_types(self.table[1:]))
     else:
         rows = ({},)
 
@@ -61,10 +59,10 @@ def _get_factory_attr(factory, attr):
     """
 
     try:
-        return getattr(factory, '_' + attr)
+        return getattr(factory, "_" + attr)
     except AttributeError:
         # pylint:disable=protected-access
-        if factory.__name__ == factory._meta.model.__name__ + 'Factory':
+        if factory.__name__ == factory._meta.model.__name__ + "Factory":
             return getattr(factory._meta.model._meta, attr)
         else:
             raise
@@ -134,22 +132,21 @@ def step_from_factory(factory):
     # attributes.
 
     try:
-        name = _get_factory_attr(factory, 'verbose_name')
+        name = _get_factory_attr(factory, "verbose_name")
     except AttributeError:
-        name = camel_case_to_spaces(
-            re.sub('Factory$', '', factory.__name__))
+        name = camel_case_to_spaces(re.sub("Factory$", "", factory.__name__))
 
     try:
-        plural = _get_factory_attr(factory, 'verbose_name_plural')
+        plural = _get_factory_attr(factory, "verbose_name_plural")
     except AttributeError:
-        plural = name + 's'
+        plural = name + "s"
 
     # pylint:disable=unused-variable
     # Functions are declared solely for the decorator side effects
     # (registering them as Lettuce steps and callbacks)
 
-    @step(r'I have an? {name}:?$'.format(name=name))
-    @step(r'I have(?: (\d+))? {plural}:?$'.format(plural=plural))
+    @step(r"I have an? {name}:?$".format(name=name))
+    @step(r"I have(?: (\d+))? {plural}:?$".format(plural=plural))
     def run_this_factory(self, count=1):
         """
         Run the factory using the step definition.

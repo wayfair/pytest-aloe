@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 # pylint:disable=redefined-builtin, unused-wildcard-import, wildcard-import
 from builtins import *
+
 # pylint:enable=redefined-builtin, unused-wildcard-import, wildcard-import
 
 import re
@@ -54,7 +55,7 @@ def guess_types(data):
             data = None
         elif data.isdigit() and not re.match("^0[0-9]+", data):
             data = int(data)
-        elif re.match(r'^\d{4}-\d{2}-\d{2}$', data):
+        elif re.match(r"^\d{4}-\d{2}-\d{2}$", data):
             data = datetime.strptime(data, "%Y-%m-%d").date()
         else:
             # it's a string
@@ -64,10 +65,7 @@ def guess_types(data):
 
     # if it's a dict, recurse as a dict
     if isinstance(data, dict):
-        return {
-            guess_types(key): guess_types(data)
-            for key, data in data.items()
-        }
+        return {guess_types(key): guess_types(data) for key, data in data.items()}
 
     # try to recurse as an iterable
     try:
@@ -77,55 +75,3 @@ def guess_types(data):
 
     #  give up
     return data
-
-
-def hook_not_reentrant(func):
-    """
-    Decorate a hook as unable to be reentered while it is already in the
-    stack.
-
-    Any further attempts to enter the hook before exiting will be replaced
-    by a no-op.
-
-    This is generally useful for step hooks where a step might call
-    :meth:`Step.behave_as` and trigger a second level of step hooks i.e.
-    when displaying information about the running test.
-    """
-
-    # closure-scoped variable to track whether this hook has been
-    # entered
-    entered = [False]
-
-    @wraps(func)
-    def inner(*args, **kwargs):
-        """
-        Wrap func to check if we've already entered this function and if
-        so replace it with a no-op.
-        """
-
-        def generator_func():
-            """
-            Hide the generator in a separate function
-            because Python 2 can't support "returning from generators"
-            """
-            if entered[0]:
-                yield
-            else:
-                try:
-                    entered[0] = True
-                    for val in func(*args, **kwargs):
-                        yield val
-                finally:
-                    entered[0] = False
-
-        if inspect.isgeneratorfunction(func):
-            return generator_func()
-        else:
-            if not entered[0]:
-                try:
-                    entered[0] = True
-                    return func(*args, **kwargs)
-                finally:
-                    entered[0] = False
-
-    return inner

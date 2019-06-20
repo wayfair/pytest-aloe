@@ -7,14 +7,13 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
 # pylint:disable=redefined-builtin,wildcard-import,unused-wildcard-import
 from builtins import *
-# pylint:enable=redefined-builtin,wildcard-import,unused-wildcard-import
 
-from nose.tools import assert_equal
 from aloe.parser import Feature
 
-SCENARIO = u"""
+SCENARIO = """
 Сценарий: Сохранение базы курсов универитета в текстовый файл
     Допустим имеем в базе университет следующие курсы:
        | Название                | Длительность  |
@@ -25,7 +24,7 @@ SCENARIO = u"""
     И во второй строке файла 'курсы.txt' строку 'Основы программирования:1'
 """
 
-SCENARIO_OUTLINE1 = u'''
+SCENARIO_OUTLINE1 = """
 Структура сценария: Заполнение пользователей в базу
     Допустим я заполняю в поле "имя" "<имя>"
     И я заполняю в поле "возраст"  "<возраст>"
@@ -36,9 +35,9 @@ SCENARIO_OUTLINE1 = u'''
     | имя  | возраст |
     | Вася | 22      |
     | Петя | 30      |
-'''
+"""
 
-FEATURE = u'''
+FEATURE = """
 Функционал: Деление чисел
   Поскольку деление сложный процесс и люди часто допускают ошибки
   Нужно дать им возможность делить на калькуляторе
@@ -50,12 +49,12 @@ FEATURE = u'''
     | 100     | 2        | 50      |
     | 28      | 7        | 4       |
     | 0       | 5        | 0       |
-'''
+"""
 
 
 def parse_scenario(string, language=None):
     """Parse a scenario, prefixing it with a feature header."""
-    feature_str = u"""
+    feature_str = """
     Функция: parse_scenario
     """
     feature_str += string
@@ -69,20 +68,13 @@ def test_scenario_ru_from_string():
     Language: RU -> Scenario.from_string
     """
 
-    scenario = parse_scenario(SCENARIO, language='ru')
+    scenario = parse_scenario(SCENARIO, language="ru")
 
-    assert_equal(
-        scenario.name,
-        u'Сохранение базы курсов универитета в текстовый файл'
-    )
-    assert_equal(
-        scenario.steps[0].hashes,
-        (
-            {u'Название': u'Матан',
-             u'Длительность': u'2 года'},
-            {u'Название': u'Основы программирования',
-             u'Длительность': u'1 год'},
-        )
+    assert scenario.name == "Сохранение базы курсов универитета в текстовый файл"
+
+    assert scenario.steps[0].hashes == (
+        {"Название": "Матан", "Длительность": "2 года"},
+        {"Название": "Основы программирования", "Длительность": "1 год"},
     )
 
 
@@ -91,18 +83,13 @@ def test_scenario_outline1_ru_from_string():
     Language: RU -> Scenario.from_string, with scenario outline, first case
     """
 
-    scenario = parse_scenario(SCENARIO_OUTLINE1, language='ru')
+    scenario = parse_scenario(SCENARIO_OUTLINE1, language="ru")
 
-    assert_equal(
-        scenario.name,
-        u'Заполнение пользователей в базу'
-    )
-    assert_equal(
-        scenario.outlines,
-        (
-            {u'имя': u'Вася', u'возраст': '22'},
-            {u'имя': u'Петя', u'возраст': '30'},
-        )
+    assert scenario.name == "Заполнение пользователей в базу"
+
+    assert scenario.outlines == (
+        {"имя": "Вася", "возраст": "22"},
+        {"имя": "Петя", "возраст": "30"},
     )
 
 
@@ -111,31 +98,21 @@ def test_feature_ru_from_string():
     Language: RU -> Feature.from_string
     """
 
-    feature = Feature.from_string(FEATURE, language='ru')
+    feature = Feature.from_string(FEATURE, language="ru")
 
-    assert_equal(
-        feature.name,
-        u'Деление чисел'
+    assert feature.name == "Деление чисел"
+
+    assert feature.description == (
+        "Поскольку деление сложный процесс и люди часто допускают ошибки\n"
+        "Нужно дать им возможность делить на калькуляторе"
     )
 
-    assert_equal(
-        feature.description,
-        u"Поскольку деление сложный процесс и люди часто допускают ошибки\n"
-        u"Нужно дать им возможность делить на калькуляторе"
-    )
+    (scenario,) = feature.scenarios
 
-    (scenario, ) = feature.scenarios
+    assert scenario.name == "Целочисленное деление"
 
-    assert_equal(
-        scenario.name,
-        u'Целочисленное деление'
-    )
-
-    assert_equal(
-        scenario.steps[-1].hashes,
-        (
-            {u'делимое': '100', u'делитель': '2', u'частное': '50'},
-            {u'делимое': '28', u'делитель': '7', u'частное': '4'},
-            {u'делимое': '0', u'делитель': '5', u'частное': '0'},
-        )
+    assert scenario.steps[-1].hashes == (
+        {"делимое": "100", "делитель": "2", "частное": "50"},
+        {"делимое": "28", "делитель": "7", "частное": "4"},
+        {"делимое": "0", "делитель": "5", "частное": "0"},
     )
