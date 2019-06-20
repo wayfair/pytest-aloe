@@ -272,8 +272,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Aloe', 'Aloe Documentation',
-     author, 'Aloe', 'One line description of project.',
+    (master_doc, 'Eucalyptus', 'Eucalyptus Documentation',
+     author, 'Eucalyptus', 'Pytest plugin for BDD testing.',
      'Miscellaneous'),
 ]
 
