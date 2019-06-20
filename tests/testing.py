@@ -148,7 +148,7 @@ class FeatureTest(unittest.TestCase):
 
         filename = self._testMethodName + ".feature"
         return self.run_features(filename);
-        # self.testdir.inline_run(filename, plugins=["pytest_aloe"])
+        # self.testdir.inline_run(filename, plugins=["pytest_eucalyptus"])
         # return TestResult(result)
 
 
@@ -176,7 +176,7 @@ class FeatureTest(unittest.TestCase):
         old_stdout = sys.stdout        
         sys.stdout = stream
         
-        result = self.testdir.inline_run(*args, plugins=["pytest_aloe"])
+        result = self.testdir.inline_run(*args, plugins=["pytest_eucalyptus"])
         sys.stdout = old_stdout        
         return TestResult(result, stream);
         

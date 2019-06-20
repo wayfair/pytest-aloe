@@ -11,12 +11,12 @@ if __name__ == '__main__':
             open('test_requirements.txt') as test_requirements, \
             io.open('README.md', encoding='utf-8') as readme:
         setup(
-            name='pytest-aloe',
+            name='pytest-eucalyptus',
             use_scm_version=True,
             description='Gherkin runner compatible with Lettuce',
             author='Dennis Miasoutov',
             author_email='dmiasoutov@wayfair.com',
-            url='https://github.com/wayfair/pytest-aloe',
+            url='https://github.com/wayfair/pytest_eucalyptus',
             long_description=readme.read(),
             classifiers=[
                 'License :: OSI Approved :: '
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
             entry_points={
                 'pytest11': [
-                    'pytest-aloe = pytest_aloe.plugin',
+                    'pytest_eucalyptus = pytest_eucalyptus.plugin',
                 ],
             },
 

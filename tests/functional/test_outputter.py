@@ -55,7 +55,7 @@ class MockTermElement(object):
 
 
 @in_directory('tests/simple_app')
-@unittest.skip("The test is no longer valid since pytest-aloe will use standard pytest Terminal Reporter.")
+@unittest.skip("The test is no longer valid since pytest_eucalyptus will use standard pytest Terminal Reporter.")
 class OutputterTest(FeatureTest):
     """
     Test level 3 outputter
