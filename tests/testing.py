@@ -131,7 +131,7 @@ class FeatureTest(unittest.TestCase):
         files = glob.iglob(os.path.join(features_dir, "*.feature"))
         dest_dir = testdir.mkdir("features");
         for file in files:
-            if os.path.isfile(file):
+            if os.path.isfile(file):                
                 shutil.copy(file, dest_dir)      
         
 

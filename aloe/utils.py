@@ -6,8 +6,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
+
 # pylint:disable=redefined-builtin, unused-wildcard-import, wildcard-import
 from builtins import *
+
 # pylint:enable=redefined-builtin, unused-wildcard-import, wildcard-import
 
 import io
@@ -42,12 +44,13 @@ def identifier(value):
     if PY3:
         return value
     else:
-        return value.encode('unicode_escape')
+        return value.encode("unicode_escape")
 
 
 if PY3:
     StreamTestWrapperIO = io.StringIO  # pylint:disable=invalid-name
 else:
+
     class StreamTestWrapperIO(io.StringIO):
         """A wrapper for capturing Nose output in tests."""
 
@@ -60,7 +63,7 @@ else:
             try:
                 super().write(str_)
             except TypeError:
-                super().write(str_.decode('utf-8'))
+                super().write(str_.decode("utf-8"))
 
 
 def unwrap_function(func):
@@ -69,14 +72,16 @@ def unwrap_function(func):
     function.
     """
 
-    if hasattr(func, '__wrapped__'):
+    if hasattr(func, "__wrapped__"):
         return func.__wrapped__
 
     # In Python 2, functools.wraps doesn't set __wrapped__, however, it is
     # possible to check whether the function has been wrapped by a known
     # method, in this case contextlib.contextmanager
-    elif func.__code__.co_filename == dummy_cm.__code__.co_filename and \
-            func.__code__.co_firstlineno == dummy_cm.__code__.co_firstlineno:
+    elif (
+        func.__code__.co_filename == dummy_cm.__code__.co_filename
+        and func.__code__.co_firstlineno == dummy_cm.__code__.co_firstlineno
+    ):
         # Get the original function from the closure
         return func.__closure__[0].cell_contents
 
@@ -84,7 +89,7 @@ def unwrap_function(func):
         return func
 
 
-RE_CAMEL_CASE = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
+RE_CAMEL_CASE = re.compile(r"(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))")
 
 
 def camel_case_to_spaces(value):
@@ -92,7 +97,7 @@ def camel_case_to_spaces(value):
     Splits CamelCase and converts to lower case. Also strips leading and
     trailing whitespace.
     """
-    return RE_CAMEL_CASE.sub(r' \1', value).strip().lower()
+    return RE_CAMEL_CASE.sub(r" \1", value).strip().lower()
 
 
 class memoizedproperty(object):  # pylint:disable=invalid-name
@@ -137,9 +142,8 @@ def get_args(func):
     :return: A list of argument names.
     :rtype: list
     """
-    if hasattr(inspect, 'signature'):
+    if hasattr(inspect, "signature"):
         params = inspect.signature(func).parameters.values()
-        return [param.name for param in params
-                if param.kind == param.POSITIONAL_OR_KEYWORD]
+        return [param.name for param in params if param.kind == param.POSITIONAL_OR_KEYWORD]
     else:
         return inspect.getargspec(func).args

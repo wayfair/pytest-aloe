@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 # pylint:disable=redefined-builtin, unused-wildcard-import, wildcard-import
 from builtins import *
+
 # pylint:enable=redefined-builtin, unused-wildcard-import, wildcard-import
 
 import re
@@ -54,7 +55,7 @@ def guess_types(data):
             data = None
         elif data.isdigit() and not re.match("^0[0-9]+", data):
             data = int(data)
-        elif re.match(r'^\d{4}-\d{2}-\d{2}$', data):
+        elif re.match(r"^\d{4}-\d{2}-\d{2}$", data):
             data = datetime.strptime(data, "%Y-%m-%d").date()
         else:
             # it's a string
@@ -64,10 +65,7 @@ def guess_types(data):
 
     # if it's a dict, recurse as a dict
     if isinstance(data, dict):
-        return {
-            guess_types(key): guess_types(data)
-            for key, data in data.items()
-        }
+        return {guess_types(key): guess_types(data) for key, data in data.items()}
 
     # try to recurse as an iterable
     try:

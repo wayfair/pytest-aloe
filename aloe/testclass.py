@@ -6,11 +6,13 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
 # pylint:disable=redefined-builtin
 from builtins import zip
 from builtins import str
 from builtins import range
 from builtins import super
+
 # pylint:enable=redefined-builtin
 
 import ast
@@ -20,18 +22,8 @@ from contextlib import contextmanager
 
 from .codegen import make_function
 from .fs import path_to_module_name
-from .parser import (
-    Background,
-    Feature,
-    Scenario,
-    Step,
-)
-from .registry import (
-    CallbackDecorator,
-    CALLBACK_REGISTRY,
-    PriorityClass,
-    STEP_REGISTRY,
-)
+from .parser import Background, Feature, Scenario, Step
+from .registry import CallbackDecorator, CALLBACK_REGISTRY, PriorityClass, STEP_REGISTRY
 from .utils import identifier, get_args
 
 
@@ -65,29 +57,32 @@ class TestStep(Step):
 
     def given(self, string):
         """Run the specified 'Given' step in the current context."""
-        self.behave_as(self.step_keyword('given') + string)
+        self.behave_as(self.step_keyword("given") + string)
 
     def when(self, string):
         """Run the specified 'When' step in the current context."""
-        self.behave_as(self.step_keyword('when') + string)
+        self.behave_as(self.step_keyword("when") + string)
 
     def then(self, string):
         """Run the specified 'Then' step in the current context."""
-        self.behave_as(self.step_keyword('then') + string)
+        self.behave_as(self.step_keyword("then") + string)
 
 
 class TestBackground(Background):
     """A background creating steps for testing."""
+
     step_class = TestStep
 
 
 class TestScenario(Scenario):
     """A background creating steps for testing."""
+
     step_class = TestStep
 
 
 class TestFeature(Feature):
     """A feature creating steps for testing."""
+
     background_class = TestBackground
     scenario_class = TestScenario
 
@@ -103,20 +98,20 @@ class TestCase(unittest.TestCase):
     @classmethod
     def before_feature(cls, feature):
         """Call feature-level before callbacks."""
-        pass        
+        pass
 
     @classmethod
     def after_feature(cls, feature):
         """Call feature-level after callbacks."""
-        pass        
+        pass
 
     # Methods for the use of the tested code
     @classmethod
-    def setUpClass(cls):        
+    def setUpClass(cls):
         cls.before_feature(cls.feature)
 
     @classmethod
-    def tearDownClass(cls):        
+    def tearDownClass(cls):
         cls.after_feature(cls.feature)
 
     def behave_as(self, context_step, string):
@@ -138,9 +133,7 @@ class TestCase(unittest.TestCase):
 
             definition = self.prepare_step(step)
 
-            definition['func'](definition['step'],
-                               *definition['args'],
-                               **definition['kwargs'])
+            definition["func"](definition["step"], *definition["args"], **definition["kwargs"])
 
     def shortDescription(self):
         return str(self)
@@ -165,25 +158,19 @@ class TestCase(unittest.TestCase):
 
         background = cls.make_background(feature.background)
         scenarios = [
-            example
-            for i, scenario in enumerate(feature.scenarios)
-            for example in cls.make_examples(scenario, i + 1)
+            example for i, scenario in enumerate(feature.scenarios) for example in cls.make_examples(scenario, i + 1)
         ]
 
-        before_feature, after_feature = \
-            CALLBACK_REGISTRY.before_after('feature')
+        before_feature, after_feature = CALLBACK_REGISTRY.before_after("feature")
 
         members = {
-            'feature': feature,
-            'background': background,
-            'before_feature': staticmethod(before_feature),
-            'after_feature': staticmethod(after_feature),
+            "feature": feature,
+            "background": background,
+            "before_feature": staticmethod(before_feature),
+            "after_feature": staticmethod(after_feature),
         }
 
-        members.update({
-            scenario.__name__: scenario
-            for scenario in scenarios
-        })
+        members.update({scenario.__name__: scenario for scenario in scenarios})
 
         class_name = identifier(feature.name)
 
@@ -199,11 +186,9 @@ class TestCase(unittest.TestCase):
         """
 
         if background is None:
-            result = make_function('def background(self): pass')
+            result = make_function("def background(self): pass")
         else:
-            result = cls.make_steps(background,
-                                    background.steps,
-                                    is_background=True)
+            result = cls.make_steps(background, background.steps, is_background=True)
 
         return result
 
@@ -229,33 +214,20 @@ def run_example(self):
                 for node in ast.walk(source.body[0].body[0]):
                     node.lineno = outline.line
 
-                context = {
-                    'outline': cls.make_steps(scenario,
-                                              steps,
-                                              is_background=False,
-                                              outline=outline)
-                }
+                context = {"outline": cls.make_steps(scenario, steps, is_background=False, outline=outline)}
 
                 yield cls.make_example(
                     make_function(
                         source=source,
                         context=context,
                         source_file=scenario.feature.filename,
-                        name='{}: Example {}'.format(scenario.name, i),
+                        name="{}: Example {}".format(scenario.name, i),
                     ),
                     scenario,
                     index,
                 )
         else:
-            yield cls.make_example(
-                cls.make_steps(
-                    scenario,
-                    scenario.steps,
-                    is_background=False,
-                ),
-                scenario,
-                index,
-            )
+            yield cls.make_example(cls.make_steps(scenario, scenario.steps, is_background=False), scenario, index)
 
     @classmethod
     def make_example(cls, method, scenario, index):
@@ -271,7 +243,7 @@ def run_example(self):
         #     method = attr(tag)(method)
 
         for tag in scenario.tags:
-            if (tag not in pytest.mark._markers):
+            if tag not in pytest.mark._markers:
                 pytest.mark._markers.add(tag)
             decorator = pytest.mark.__getattr__(tag)
             method = decorator(method)
@@ -290,18 +262,12 @@ def run_example(self):
         """
 
         func, args, kwargs = STEP_REGISTRY.match_step(step)
-        func = CALLBACK_REGISTRY.wrap('step', func, step)
+        func = CALLBACK_REGISTRY.wrap("step", func, step)
 
-        return {
-            'step': step,
-            'func': func,
-            'args': args,
-            'kwargs': kwargs,
-        }
+        return {"step": step, "func": func, "args": args, "kwargs": kwargs}
 
     @classmethod
-    def make_steps(cls, step_container, steps,
-                   is_background, outline=None):
+    def make_steps(cls, step_container, steps, is_background, outline=None):
         """
         Construct either a scenario or a background calling the specified
         steps.
@@ -312,15 +278,12 @@ def run_example(self):
 
         assert steps
 
-        step_definitions = [
-            cls.prepare_step(step)
-            for step in steps
-        ]
+        step_definitions = [cls.prepare_step(step) for step in steps]
 
-        source = 'def run_steps(self):\n'
+        source = "def run_steps(self):\n"
         if not is_background:
-            source += '    self.background()\n'
-        source += '\n'.join(
+            source += "    self.background()\n"
+        source += "\n".join(
             # This has to be a single statement, in order to set its source
             # location as a whole below
             """
@@ -330,7 +293,9 @@ def run_example(self):
         func{i}(step{i}, *args, **kwargs)
     finally:
         step{i}.test = None
-            """.format(i=i)
+            """.format(
+                i=i
+            )
             for i in range(len(step_definitions))
         )
         source = ast.parse(source)
@@ -345,30 +310,20 @@ def run_example(self):
                 node.lineno = step.line
 
         # Supply all the step functions and arguments
-        context = {
-            k + str(i): v
-            for i, definition in enumerate(step_definitions)
-            for k, v in definition.items()
-        }
+        context = {k + str(i): v for i, definition in enumerate(step_definitions) for k, v in definition.items()}
 
         if is_background:
-            func_name = 'background'
+            func_name = "background"
         else:
             func_name = step_container.name
 
-        run_steps = make_function(
-            source=source,
-            context=context,
-            source_file=step_container.filename,
-            name=func_name,
-        )
+        run_steps = make_function(source=source, context=context, source_file=step_container.filename, name=func_name)
 
         if not is_background:
-            run_steps = CALLBACK_REGISTRY.wrap('example', run_steps,
-                                               step_container, outline, steps)
-            if (step_container.tags):
+            run_steps = CALLBACK_REGISTRY.wrap("example", run_steps, step_container, outline, steps)
+            if step_container.tags:
                 for tag in list(step_container.tags):
-                    if (tag not in pytest.mark._markers):
+                    if tag not in pytest.mark._markers:
                         pytest.mark._markers.add(tag)
                     decorator = pytest.mark.__getattr__(tag)
                     run_steps = decorator(run_steps)
@@ -382,16 +337,9 @@ def run_example(self):
         order they were declared in the feature, together with their indices.
         """
 
-        scenarios = {
-            name: method
-            for name, method in cls.__dict__.items()
-            if getattr(method, 'is_example', False)
-        }
+        scenarios = {name: method for name, method in cls.__dict__.items() if getattr(method, "is_example", False)}
 
-        with_indices = [
-            (method.scenario_index, name)
-            for name, method in scenarios.items()
-        ]
+        with_indices = [(method.scenario_index, name) for name, method in scenarios.items()]
 
         return sorted(with_indices)
 
@@ -402,24 +350,18 @@ def run_example(self):
         all_fixture_args = list(request._fixturemanager._arg2fixturedefs.keys()) if request else []
         # fill all fixture arguments and add it to existing step_kwargs
         step_fixture_args = [arg for arg in all_args if arg in all_fixture_args]
-        
+
         # Python > 3.5
-        # kwargs = { **step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args) }
-        args_dict = dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args)
-        kwargs = step_kwargs.copy()
-        kwargs.update(args_dict)
+        kwargs = {**step_kwargs, **dict((arg, request.getfixturevalue(arg)) for arg in step_fixture_args)}
 
         # identity what arguments left and fill them from step arguments
-        filled_args = kwargs.keys();        
+        filled_args = kwargs.keys()
         left_over_args = [arg for arg in all_args if arg not in filled_args]
 
         # Python > 3.5
-        # kwargs = { **kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args)) }       
-        args_dict = dict((arg, value) for arg, value in zip(left_over_args, step_args))
-        new_kwargs = kwargs.copy()
-        new_kwargs.update(args_dict)
+        kwargs = {**kwargs, **dict((arg, value) for arg, value in zip(left_over_args, step_args))}
 
-        return (), new_kwargs
+        return (), kwargs
 
     @classmethod
     def getFunctionRequest(cls, function_name):
@@ -428,11 +370,11 @@ def run_example(self):
                 if function_name == function._request.node.name:
                     return function._request
 
+
 # A decorator to add callbacks which wrap the steps tighter than all the user
 # callbacks.
 # pylint:disable=invalid-name
-inner_around = CallbackDecorator(CALLBACK_REGISTRY, 'around',
-                                 priority_class=PriorityClass.SYSTEM_INNER)
+inner_around = CallbackDecorator(CALLBACK_REGISTRY, "around", priority_class=PriorityClass.SYSTEM_INNER)
 # pylint:enable=invalid-name
 
 

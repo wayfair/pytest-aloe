@@ -14,9 +14,7 @@
                 "-m",
                 "pytest",
                 "tests/functional",
-                "-vvv",
-                "-k",
-                "test_factoryboy"                
+                "-vvv"                
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

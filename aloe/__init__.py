@@ -12,12 +12,7 @@ from __future__ import absolute_import
 import sys
 import threading
 
-from aloe.registry import (
-    after,
-    around,
-    before,
-    step,
-)
+from aloe.registry import after, around, before, step
 
 world = threading.local()  # pylint:disable=invalid-name
 
@@ -29,7 +24,7 @@ def main(argv=None):  # pragma: no cover
 
     if argv is None:
         argv = sys.argv
-    
 
-if __name__ == '__main__':  # pragma: no cover
+
+if __name__ == "__main__":  # pragma: no cover
     main()

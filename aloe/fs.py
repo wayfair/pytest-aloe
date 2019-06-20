@@ -25,11 +25,11 @@ def path_to_module_name(filename):
     while True:
         filename, component = os.path.split(filename)
         dotted_path.insert(0, component)
-        if filename == '':
+        if filename == "":
             break
 
     dotted_path[-1] = os.path.splitext(dotted_path[-1])[0]
-    if dotted_path[-1] == '__init__':
+    if dotted_path[-1] == "__init__":
         dotted_path.pop()
 
-    return '.'.join(dotted_path)
+    return ".".join(dotted_path)

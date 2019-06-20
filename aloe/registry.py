@@ -7,10 +7,12 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
 # pylint:disable=redefined-builtin
 from builtins import bytes
 from builtins import super
 from builtins import str
+
 # pylint:enable=redefined-builtin
 
 import re
@@ -18,28 +20,16 @@ from collections import OrderedDict
 from functools import wraps, partial
 
 from aloe.codegen import multi_manager
-from aloe.exceptions import (
-    undefined_step,
-    StepLoadingError,
-)
+from aloe.exceptions import undefined_step, StepLoadingError
 from aloe.utils import unwrap_function
 
 
 # What part of the test to hook
-HOOK_WHAT = (
-    'all',
-    'feature',
-    'example',
-    'step',
-)
+HOOK_WHAT = ("all", "feature", "example", "step")
 
 
 # When to execute the hook in relation to the test part
-HOOK_WHEN = (
-    'before',
-    'after',
-    'around',
-)
+HOOK_WHEN = ("before", "after", "around")
 
 
 class PriorityClass(object):
@@ -65,13 +55,7 @@ class CallbackDict(dict):
         """
         Initialize the callback lists for every kind of situation.
         """
-        super().__init__({
-            what: {
-                when: {}
-                for when in HOOK_WHEN
-            }
-            for what in HOOK_WHAT
-        })
+        super().__init__({what: {when: {} for when in HOOK_WHEN} for what in HOOK_WHAT})
 
     @classmethod
     def _function_id(cls, func):
@@ -103,6 +87,7 @@ class CallbackDict(dict):
         funcs = self[what][when].setdefault(priority, OrderedDict())
         funcs.pop(name, None)
         funcs[name] = function
+
     # pylint:enable=too-many-arguments
 
     def clear(self, name=None, priority_class=None):
@@ -116,12 +101,7 @@ class CallbackDict(dict):
                 if priority_class is None:
                     action_values = when_dict.values()
                 else:
-                    action_values = (
-                        value
-                        for (pc, _), value
-                        in when_dict.items()
-                        if pc == priority_class
-                    )
+                    action_values = (value for (pc, _), value in when_dict.items() if pc == priority_class)
                 for callback_list in action_values:
                     if name is None:
                         callback_list.clear()
@@ -133,9 +113,7 @@ class CallbackDict(dict):
         Get all the hooks for a certain event, sorted appropriately.
         """
         return tuple(
-            func
-            for priority in sorted(self[what][when].keys())
-            for func in self[what][when][priority].values()
+            func for priority in sorted(self[what][when].keys()) for func in self[what][when][priority].values()
         )
 
     def wrap(self, what, function, *hook_args, **hook_kwargs):
@@ -144,9 +122,9 @@ class CallbackDict(dict):
         to the given test part.
         """
 
-        before_hooks = self.hook_list(what, 'before')
-        around_hooks = self.hook_list(what, 'around')
-        after_hooks = self.hook_list(what, 'after')
+        before_hooks = self.hook_list(what, "before")
+        around_hooks = self.hook_list(what, "around")
+        after_hooks = self.hook_list(what, "after")
 
         multi_hook = multi_manager(*around_hooks)
 
@@ -171,9 +149,9 @@ class CallbackDict(dict):
         Return a pair of functions to execute before and after the event.
         """
 
-        before_hooks = self.hook_list(what, 'before')
-        around_hooks = self.hook_list(what, 'around')
-        after_hooks = self.hook_list(what, 'after')
+        before_hooks = self.hook_list(what, "before")
+        around_hooks = self.hook_list(what, "around")
+        after_hooks = self.hook_list(what, "after")
 
         multi_hook = multi_manager(*around_hooks)
 
@@ -233,11 +211,7 @@ class StepDict(object):
     def unload_func(self, func):
         """Remove any mappings for a given function."""
 
-        sentences_to_remove = list(
-            sentence
-            for sentence, (_, step_func) in self.steps.items()
-            if step_func == func
-        )
+        sentences_to_remove = list(sentence for sentence, (_, step_func) in self.steps.items() if step_func == func)
         for sentence in sentences_to_remove:
             del self.steps[sentence]
 
@@ -265,10 +239,10 @@ class StepDict(object):
 
     def extract_sentence(self, func):
         """Extract the step sentence from a function."""
-        func = getattr(func, '__func__', func)
-        sentence = getattr(func, '__doc__', None)
+        func = getattr(func, "__func__", func)
+        sentence = getattr(func, "__doc__", None)
         if sentence is None:
-            sentence = func.__name__.replace('_', ' ')
+            sentence = func.__name__.replace("_", " ")
             sentence = sentence[0].upper() + sentence[1:]
         return sentence
 
@@ -277,21 +251,21 @@ class StepDict(object):
         try:
             return re.compile(sentence, re.I | re.U)
         except re.error as exc:
-            raise StepLoadingError("Error when trying to compile:\n"
-                                   "  regex: %r\n"
-                                   "  for function: %s\n"
-                                   "  error: %s" % (sentence, func, exc))
+            raise StepLoadingError(
+                "Error when trying to compile:\n"
+                "  regex: %r\n"
+                "  for function: %s\n"
+                "  error: %s" % (sentence, func, exc)
+            )
 
     def _attr_is_step(self, attr, obj):
         """Test whether an object's attribute is a step."""
-        return attr[0] != '_' and self._is_func_or_method(getattr(obj, attr))
+        return attr[0] != "_" and self._is_func_or_method(getattr(obj, attr))
 
     def _is_func_or_method(self, func):
         """Test whether an object is a function or a method."""
         func_dir = dir(func)
-        return callable(func) and (
-            'func_name' in func_dir
-            or '__func__' in func_dir)
+        return callable(func) and ("func_name" in func_dir or "__func__" in func_dir)
 
     def match_step(self, step_):
         """
@@ -432,9 +406,7 @@ class CallbackDecorator(object):
 
         priority = (self.priority_class, priority)
 
-        self.registry.append_to(what, self.when, function,
-                                name=name,
-                                priority=priority)
+        self.registry.append_to(what, self.when, function, name=name, priority=priority)
         return function
 
     def make_decorator(what):  # pylint:disable=no-self-argument
@@ -449,17 +421,18 @@ class CallbackDecorator(object):
             """Decorator method for a particular situation."""
             # pylint:disable=protected-access
             return self._decorate(what, function, **kwargs)
+
         return decorator
 
-    each_step = make_decorator('step')
-    each_example = make_decorator('example')
-    each_feature = make_decorator('feature')
-    all = make_decorator('all')
+    each_step = make_decorator("step")
+    each_example = make_decorator("example")
+    each_feature = make_decorator("feature")
+    all = make_decorator("all")
 
 
 # These are functions, not constants
 # pylint:disable=invalid-name
-after = CallbackDecorator(CALLBACK_REGISTRY, 'after')
-around = CallbackDecorator(CALLBACK_REGISTRY, 'around')
-before = CallbackDecorator(CALLBACK_REGISTRY, 'before')
+after = CallbackDecorator(CALLBACK_REGISTRY, "after")
+around = CallbackDecorator(CALLBACK_REGISTRY, "around")
+before = CallbackDecorator(CALLBACK_REGISTRY, "before")
 # pylint:enable=invalid-name

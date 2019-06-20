@@ -77,10 +77,10 @@ class SimpleScenarioTest(FeatureTest):
 
         output = stream.getvalue()       
 
-        feature_stack_frame = """
+        feature_stack_frame = f"""
 >       Then the result should be 40 on the screen
 
-{failing_feature}:11:""".format(failing_feature)
+{failing_feature}:11:"""
 
         self.assertIn(feature_stack_frame, output)        
 
@@ -104,10 +104,10 @@ E       AssertionError: assert 30.0 == 40.0
 
         output = stream.getvalue()       
 
-        feature_stack_frame = """
+        feature_stack_frame = f"""
 {failing_feature}:11: in background
     Then the result should be 40 on the screen
-""".format(failing_feature)
+"""
         self.assertIn(feature_stack_frame, output)        
 
         step_stack_frame = """
@@ -133,18 +133,18 @@ E       AssertionError: assert 30.0 == 40.0
         output = stream.getvalue()
 
         if PY3:
-            feature_stack_frame = """
+            feature_stack_frame = f"""
 >       那么结果应该是40
 
 {failing_feature}:12:
-""".strip().format(failing_feature)
+""".strip()
 
             self.assertIn(feature_stack_frame, output)
         else:
             # Cannot use non-ASCII method names in Python 2
-            feature_stack_frame = """
+            feature_stack_frame = f"""
 {failing_feature}:12:
-            """.format(failing_feature)
+            """
 
             self.assertIn(feature_stack_frame, output)
 
@@ -220,11 +220,11 @@ E       AssertionError: assert 30.0 == 40.0
 
         output = stream.getvalue()        
         
-        feature_stack_frame = """
+        feature_stack_frame = f"""
 >         | 50     |
 
 {failing_feature}:22: 
-""".format(failing_feature)
+"""
 
         self.assertIn(feature_stack_frame, output)      
 
