@@ -6,22 +6,10 @@ python:
 install: pip install tox-travis
 script: tox
 deploy:
-  - provider: pypi
-    user: wayfair    
-    password:
-      secure: p6I7Vwbvd0+HFo9ZTmITZo4TlHSP9u8j0Qo37t8Qi1XFREYktfVpYetheE6wekw7hieTp3PViem9ARP6vAhFbUQ38iNlNir+KA4xHS3PnKWQW6eLmxtSZQfM/3Ac3HEcXAnQB/3OlKHS/NZtU4o6xr6MGueoAw0f9Yi50YFKA6/Dk6mnKp3wPZD5191/tzh+1f2aAC2a0OB6s7U3ZtFWE/gRgyBmyZGaiqCTBin93oHsYplBnsKuRdtJ19q/GP0Jh9RyB3za2JaFgZ+BCzhKA2c3xcUoB99Rd/l57LwbzI0h4y6XHerR8yIWb7y40GSoKPlXoHkeoSDwmaWJWrfCKgOttnbN+QdbtdQoTWuJWo/c8j4oj9NBO687Mn41YT/OqicZnRhJk4+HigyPjgiQnrJbUXhlQ+p6gmwhktE7fdFLSzt/HCgrZnVrgf5JSK++X0ne7M11tffy076XsFwJLnuqT4jj7188PxFhBWUf8rGCi0wRzUtk5NHdI/TIQszYp4puXQ9KPAao66OModDufO36Ch8reeX/sFjXNS/kL5wLy+79bkGOxczcEgGJEo75w8k61yMnAOpGPRFEJ6/SXUNamZ+ZKcF/E0VXywOYAUSVdrTzqFlq3eeUK3jmZOuyFqFG3ovlkJvJD3WiPJ7bVYGzZ/YWGgyyNPctqmyl/b8=
+  - provider: pypi    
     distributions: sdist bdist_wheel
     skip_existing: true
     skip_cleanup: true
     on:
       repo: wayfair/pytest-eucalyptus
-      branch: master      
-
-  - provider: releases
-    api_key:
-      secure: a0MGyL7hq6+3Ne4vTIWqlEb6egloQuh7EYbv7SL+QClKg5tYEtTrTmMK6zsLvhkG3h+GaVZnHWVlKzqijTZWX/naYUZ5zty6D0VrM4lzXGUJlfWVufqNC0jOkO8Ad0v5P29rOFbu3+40JE98rohKEFgcKmRl317rsvALYxVymTuVX9E4xkAU7VeDHFMcfGQfpLoDyrNukCjyPkm4Glyq7ZECAGmKpnfc4SFtPmDCX+ltNwkNfYqikYkQ6aTVZw/6Pb6ps3yh7XH9RlIFrvIdPmRMJ9bDRcqn68syK3CAfAw5Rupl2m6Re7sDoGp+C691wbX0hV0rQ7N1NfZ3PeibgB+vBMj3/UkJVf3REN1H74AA7ajEzcAwwNzgAt44HibIA2Rk+eB7OY7i9fB6DAArRCuzVjcqXGNBR6sGBuizXr3zh+3kQfK0xgW7/pn+LEeCOVBwtL5bJrDcOkP/cL3WNX14nrU8R2Qc4iTiLLtjngzAY8igYkgHFh9KMTrkBrmcO1o7x0KO4ZBTeMqZEpZ9IlssM61LWtYh6Zr2AvoYo/x+LYfgaHQQEreaLzG57ksqEtcffqx7b3W2yRuLjgZKr0h4i+jkZJhb9u9m7zTBuxZPG+wrEJ+c0cxniTVkzcYt701GpID9PrfYwNo2PmYRrGCmIcrFMcBiMJytGokJXx8=
-    file: 
-      dist/*.whl
-      dist/*.tar.gz
-    on:
-      repo: wayfair/pytest-eucalyptus
+      branch: master
