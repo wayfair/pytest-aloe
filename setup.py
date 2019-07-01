@@ -3,16 +3,19 @@ Setup script.
 """
 
 import io
+import ast
+import re
 from setuptools import setup, find_packages
 
 if __name__ == '__main__':
     with \
             open('requirements.txt') as requirements, \
             open('test_requirements.txt') as test_requirements, \
+            open("pytest_eucalyptus/__init__.py", "rb") as f:
             io.open('README.md', encoding='utf-8') as readme:
         setup(
             name='pytest_eucalyptus',
-            use_scm_version=True,
+            version = str(ast.literal_eval(_version_re.search(f.read().decode("utf-8")).group(1))),
             description='Gherkin runner compatible with Lettuce',
             author='Dennis Miasoutov',
             author_email='dmiasoutov@wayfair.com',
