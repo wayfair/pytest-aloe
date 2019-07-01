@@ -7,6 +7,7 @@ import ast
 import re
 from setuptools import setup, find_packages
 
+_version_re = re.compile(r"__version__\s+=\s+(.*)")
 if __name__ == '__main__':
     with \
             open('requirements.txt') as requirements, \
