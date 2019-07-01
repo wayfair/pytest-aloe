@@ -6,10 +6,11 @@ python:
 install: pip install tox-travis
 script: tox
 deploy:
-  - provider: pypi    
-    distributions: sdist bdist_wheel
-    skip_existing: true
-    skip_cleanup: true
-    on:
-      repo: wayfair/pytest-eucalyptus
-      branch: master
+  provider: pypi
+  user: wayfair
+  distributions: sdist bdist_wheel
+  skip_existing: true
+  skip_cleanup: true
+  on:
+    repo: wayfair/pytest-eucalyptus
+    branch: master
