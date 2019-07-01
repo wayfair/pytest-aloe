@@ -11,7 +11,7 @@ if __name__ == '__main__':
     with \
             open('requirements.txt') as requirements, \
             open('test_requirements.txt') as test_requirements, \
-            open("pytest_eucalyptus/__init__.py", "rb") as f:
+            open("pytest_eucalyptus/__init__.py", "rb") as f, \
             io.open('README.md', encoding='utf-8') as readme:
         setup(
             name='pytest_eucalyptus',
