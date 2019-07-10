@@ -81,7 +81,9 @@ class FeatureUnitTestCase(UnitTestCase):
             if not getattr(x, "__test__", True):
                 continue
             funcobj = getimfunc(x)
-            yield TestCaseFunction(name, parent=self, callobj=funcobj)
+            function = TestCaseFunction(name, parent=self, callobj=funcobj)
+            self.obj.functions.append(function)
+            yield function
             foundsomething = True
 
 
