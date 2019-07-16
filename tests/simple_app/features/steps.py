@@ -62,6 +62,31 @@ def assert_result(self, result):
     assert world.result == float(result)
 
 
+@step(r'something useful')
+def something_useful(self):    
+    world.message = 'something useful'
+
+
+@step(r'something useful with cookies')
+def something_useful_with_cookies(self):   
+    world.message = 'something useful with cookies'
+
+
+@step(r'there is something with cookies')
+def something_useful_with_cookies_result(self):    
+     assert world.message == 'something useful with cookies'
+
+
+@step(r'some cookies')
+def something_useful_with_cookies(self):   
+    assert world.message == 'cookies'
+
+
+@step(r'there are some cookies')
+def something_useful_with_cookies(self):   
+    world.message = 'cookies'
+    
+
 @after.each_example
 def record_all_results(scenario, outline, steps):
     """

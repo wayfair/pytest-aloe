@@ -249,6 +249,8 @@ class StepDict(object):
     def _assert_is_step(self, sentence, func):
         """Compile a step definition or raise an error."""
         try:
+            if not sentence.endswith("$"):
+                sentence += "$"
             return re.compile(sentence, re.I | re.U)
         except re.error as exc:
             raise StepLoadingError(
@@ -273,16 +275,27 @@ class StepDict(object):
 
         Returns a tuple of (function, args, kwargs).
         """
+        # strip the first word which will be Given, Then, When or And
+        # sentence = step_.sentence.split(' ', 1)[1]
+        matched = None
+        matched_func = None
+        matched_pos = len(step_.sentence)
 
         for regex, func in self.steps.values():
-            matched = regex.search(step_.sentence)
-            if matched:
-                kwargs = matched.groupdict()
-                if kwargs:
-                    return (func, (), matched.groupdict())
-                else:
-                    args = matched.groups()
-                    return (func, args, {})
+            new_match = regex.search(step_.sentence)
+            if new_match:
+                pos = new_match.start(0)
+                if pos < matched_pos:
+                    matched = new_match
+                    matched_func = func
+
+        if matched:
+            kwargs = matched.groupdict()
+            if kwargs:
+                return (matched_func, (), matched.groupdict())
+            else:
+                args = matched.groups()
+                return (matched_func, args, {})
 
         return (undefined_step, (), {})
 

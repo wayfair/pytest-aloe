@@ -51,7 +51,7 @@ def count_users(self, nusers):
     assert nusers == len(User.users)
 
 
-@step('the user list contains')
+@step('the user list contains:')
 def check_users(self):
     """Look for users in my user list"""
 

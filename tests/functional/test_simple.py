@@ -41,6 +41,13 @@ class SimpleScenarioTest(FeatureTest):
         """
 
         self.assert_feature_success('features/calculator.feature')
+    
+    def test_exact_match(self):
+        """
+        Test running a simple feature.
+        """
+
+        self.assert_feature_success('features/exact_match.feature')
 
     def test_success_zh(self):
         """
