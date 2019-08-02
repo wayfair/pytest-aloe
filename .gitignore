@@ -9,4 +9,4 @@ tmp_file_*
 /docs/_build/
 /tests/integration/calculator-actual.txt
 .tox
-.conerage
+.coverage

@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "${workspaceFolder}/.tox/py37/bin/python3"
+    "python.pythonPath": "${workspaceFolder}/.tox/py37/bin/python3",
+    "restructuredtext.confPath": "${workspaceFolder}/docs"
 }
