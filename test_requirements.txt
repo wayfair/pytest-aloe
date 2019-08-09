@@ -4,5 +4,5 @@ mock
 pycodestyle
 pylint>=1.9.3
 setuptools_scm
-Sphinx
+Sphinx>=2.1.2
 pytest-cov==2.5.1
