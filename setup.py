@@ -17,14 +17,14 @@ if __name__ == '__main__':
         setup(
             name='pytest_eucalyptus',
             version = str(ast.literal_eval(_version_re.search(f.read().decode("utf-8")).group(1))),
-            description='Gherkin runner compatible with Lettuce',
+            description='Pytest Plugin for BDD',
             author='Dennis Miasoutov',
             author_email='dmiasoutov@wayfair.com',
             url='https://github.com/wayfair/pytest-eucalyptus',
             long_description=readme.read(),
+            long_description_content_type='text/markdown',
             classifiers=[
-                'License :: OSI Approved :: '
-                + 'GNU General Public License v3 or later (GPLv3+)',
+                'License :: Apache License 2.0'
                 'Programming Language :: Python',
                 'Programming Language :: Python :: 2',
                 'Programming Language :: Python :: 3',

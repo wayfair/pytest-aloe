@@ -1,9 +1,9 @@
 Getting Started
 ===============
 
-Install Aloe_::
+Install Eucalyptus_::
 
-    pip install aloe
+    pip install pytest pytest-eucalyptus
 
 Write your first feature ``features/calculator.feature``:
 
@@ -23,12 +23,12 @@ Write your first feature ``features/calculator.feature``:
 
 Features are written using the `Gherkin syntax`_.
 
-Now run ``aloe features/calculator.feature`` and see it fail because there are
+Now run ``pytest features/calculator.feature`` and see it fail because there are
 no step definitions:
 
 .. code-block:: console
 
-    $ aloe features/calculator.feature
+    $ pytest features/calculator.feature
     (...)
     aloe.exceptions.NoDefinitionFound: The step r"Given I have entered 50 into the
     calculator" is not defined
@@ -44,7 +44,7 @@ Now add the definitions in ``features/__init__.py``:
 
     from calculator import add
 
-    from aloe import before, step, world
+    from pytest_eucalyptus import before, step, world
 
 
     @before.each_example
@@ -75,13 +75,13 @@ And the implementation stub in ``calculator.py``:
     def add(*numbers):
         return 0
 
-Aloe will tell you that there is an error, including the location of the
+Pytest-Eucalyptus will tell you that there is an error, including the location of the
 failing step, as if it was a normal Python test:
 
 .. code-block:: console
     :emphasize-lines: 9,10
 
-    $ aloe features/calculator.feature
+    $ pytest features/calculator.feature
 
     F
     ======================================================================
@@ -91,7 +91,7 @@ failing step, as if it was a normal Python test:
       (...)
       File ".../features/calculator.feature", line 11, in Add two numbers
         Then the result should be 80 on the screen
-      File ".../aloe/registry.py", line 161, in wrapped
+      File ".../pytest-eucalyptus/registry.py", line 161, in wrapped
         return function(*args, **kwargs)
       File ".../features/__init__.py", line 25, in assert_result
         assert world.result == float(result)
@@ -113,7 +113,7 @@ Now it works:
 
 .. code-block:: console
 
-    $ aloe features/calculator.feature
+    $ pytest features/calculator.feature
     .
     ----------------------------------------------------------------------
     Ran 1 test in 0.001s

@@ -4,7 +4,7 @@ Defining Steps
 .. toctree::
     :maxdepth: 2
 
-.. autofunction:: aloe.step(sentence=None)
+.. autofunction:: pytest_eucalyptus.step(sentence=None)
 
 Common regular expressions for capturing data
 ---------------------------------------------
@@ -43,7 +43,7 @@ Step loading
 ------------
 
 Steps can and should be defined in separate modules to the main application
-code. Aloe searches for modules to load steps from inside the ``features``
+code. Eucalytptus searches for modules to load steps from inside the ``features``
 directories.
 
 Steps can be placed in separate files, for example,
@@ -51,8 +51,7 @@ Steps can be placed in separate files, for example,
 files must be importable, so this requires creating a (possibly empty)
 ``features/steps/__init__.py`` alongside.
 
-Additional 3rd-party steps (such as `aloe_django`_) can be imported in from
-your ``__init__.py``.
+Additional 3rd-party steps can be imported in from your ``__init__.py``.
 
 An imported step can be overridden by using :meth:`unregister()` on the
 function registered as a step. It can be then reused by defining a new step
@@ -69,6 +68,37 @@ Tools for step writing
 
 .. automodule:: aloe.tools
     :members:
+
+Pytest Integration
+----------------------
+
+Fixtures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Step arguments can be injected from step definition or be pytest fixtures. 
+Arguments are resolved at runtime based on regusted fixture names.
+
+Examples:
+
+.. code-block:: python
+
+    import pytest
+    from pytest-eucalyptus import step
+
+    @pytest.fixture
+    def foo():
+        return "foo"
+
+
+    @step("I have injected foo")
+    def injecting_given(self, foo):
+        return "injected " + foo
+
+
+    @step('I have "([^"]*)" and foo')
+    def foo_is_foo(self, string_param, foo):
+        assert foo == 'foo'
+
 
 Writing good BDD steps
 ----------------------
@@ -134,7 +164,7 @@ steps.
                 set_flag(flag, enabled=False)
 
     Furthermore, steps that are needed by all features can be moved to a
-    :func:`~aloe.before.each_example` callback.
+    :func:`~eucalytptus.before.each_example` callback.
 
     If you want to write reusable steps, you can sometimes mix behavior
     and declaration.
