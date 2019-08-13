@@ -5,6 +5,7 @@ Migrated from Nose to Pytest.
 [![pypi][pypi]][pypi-url]
 [![pypi-versions][pypi-versions]][pypi-url]
 [![builds][builds]][builds-url]
+[![docs][docs]][docs-url]
 [![coverage][cover]][cover-url]
 
 **pytest-eucalyptus** has been built to feature the best of both worlds: 
@@ -95,7 +96,7 @@ calculator.feature .                                                     [100%]
 
 ## Documentation
 
-Please find more [docs here ](https://eucalyptus.readthedocs.io/).
+Please find more docs [here](https://eucalyptus.readthedocs.io/).
 
 ## License
 
@@ -110,3 +111,6 @@ Pytest-Eucalyptus is licensed under the Apache License 2.0 – see the [LICENSE.
 
 [cover]: https://codecov.io/gh/wayfair/pytest-eucalyptus/branch/master/graph/badge.svg
 [cover-url]: https://codecov.io/gh/wayfair/pytest-eucalyptus
+
+[docs]: https://readthedocs.org/projects/eucalyptus/badge/?version=latest
+[docs-url]: https://eucalyptus.readthedocs.io/?badge=latest
