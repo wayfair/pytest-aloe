@@ -24,7 +24,7 @@ if __name__ == '__main__':
             long_description=readme.read(),
             long_description_content_type='text/markdown',
             classifiers=[
-                'License :: Apache License 2.0'
+                'License :: Apache License 2.0',
                 'Programming Language :: Python',
                 'Programming Language :: Python :: 2',
                 'Programming Language :: Python :: 3',
