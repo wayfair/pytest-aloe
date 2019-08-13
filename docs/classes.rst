@@ -1,6 +1,8 @@
 Features, Scenarios and Steps
 =============================
 
+Since Eucalyptus_ is a fork of Aloe_ this pages covers aloe internals which should not be different from original docs.
+
 .. toctree::
     :maxdepth: 2
 

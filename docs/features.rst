@@ -104,7 +104,7 @@ See docs for the `Attribute selector plugin`_ for more information.
 Feature Loading
 ---------------
 
-If features are not specified on the command line, Aloe will look for features
+If features are not specified on the command line, Eucalyptus will look for features
 in directories that are both:
 
  * Named ``features``;

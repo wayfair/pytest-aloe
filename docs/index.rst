@@ -1,30 +1,28 @@
 ============================
- Aloe: BDD testing via nose
+ Eucalyptus: BDD testing via pytest
 ============================
 
-Aloe is a Gherkin_-based Behavior Driven Development tool for Python based
-on Nose_.
+Eucalyptus is a Gherkin_-based Behavior Driven Development tool for Python based
+on Pytest_.
 
 .. toctree::
     :maxdepth: 2
-
-    aloe
+    
     features
     steps
     hooks
-    classes
-    extras
+    classes    
     extending
     porting
 
 .. include:: getting-started.rst
 
 
+
 History
 =======
 
-`Aloe` originally started life as a branch of the Python BDD tool Lettuce_.
-Like so many succulents, it grew into so much more than that.
+`Eucalyptus` is a fork of Aloe_ which uses Pytest_ instead of Nose_.
 
 
 Indices and tables
