@@ -2,9 +2,10 @@
 > A nice fork of [Aloe](https://github.com/aloetesting/aloe). 
 Migrated from Nose to Pytest.
 
-![version](https://img.shields.io/pypi/v/pytest-eucalyptus.svg)
-![pyversions](https://img.shields.io/pypi/pyversions/pytest-eucalyptus.svg)
-![build](https://travis-ci.org/wayfair/pytest-eucalyptus.svg?branch=master)
+[![pypi][pypi]][pypi-url]
+[![pypi-versions][pypi-versions]][pypi-url]
+[![builds][builds]][builds-url]
+[![coverage][cover]][cover-url]
 
 **pytest-eucalyptus** has been built to feature the best of both worlds: 
 - [Aloe](https://github.com/aloetesting/aloe) which implements great infrastructure and uses the original Gherkin parser.
@@ -99,3 +100,13 @@ Please find more [docs here ](https://eucalyptus.readthedocs.io/).
 ## License
 
 Pytest-Eucalyptus is licensed under the Apache License 2.0 – see the [LICENSE.md](https://github.com/wayfair/pytest-eucalyptus/blob/master/LICENSE) for specific details.
+
+[pypi]: https://img.shields.io/pypi/v/pytest-eucalyptus.svg
+[pypi-versions]: https://img.shields.io/pypi/pyversions/pytest-eucalyptus.svg
+[pypi-url]: https://pypi.org/project/pytest-eucalyptus
+
+[builds]: https://travis-ci.org/wayfair/pytest-eucalyptus.svg?branch=master
+[builds-url]: https://travis-ci.org/wayfair/pytest-eucalyptus
+
+[cover]: https://codecov.io/gh/wayfair/pytest-eucalyptus/branch/master/graph/badge.svg
+[cover-url]: https://codecov.io/gh/wayfair/pytest-eucalyptus
