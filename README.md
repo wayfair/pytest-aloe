@@ -7,6 +7,8 @@ Migrated from Nose to Pytest.
 [![builds][builds]][builds-url]
 [![docs][docs]][docs-url]
 [![coverage][cover]][cover-url]
+[![Quality Gate Status][sonar]](sonar-url)
+
 
 **pytest-eucalyptus** has been built to feature the best of both worlds: 
 - [Aloe](https://github.com/aloetesting/aloe) which implements great infrastructure and uses the original Gherkin parser.
@@ -114,3 +116,7 @@ Pytest-Eucalyptus is licensed under the Apache License 2.0 – see the [LICENSE.
 
 [docs]: https://readthedocs.org/projects/eucalyptus/badge/?version=latest
 [docs-url]: https://eucalyptus.readthedocs.io/?badge=latest
+
+
+[sonar]: https://sonarcloud.io/api/project_badges/measure?project=wayfair_pytest-eucalyptus&metric=alert_status
+[sonar-url]: https://sonarcloud.io/dashboard?id=wayfair_pytest-eucalyptus
